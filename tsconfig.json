@@ -21,7 +21,8 @@
         "@t/*": ["./@types/*"],
         "@c/*": ["./src/components/*"],
         "styles/*": ["./src/scss/*"],
-        "@i/*": ["./src/assets/icons/*"]
+        "@i/*": ["./src/assets/icons/*"],
+        "@cs/*": ["./src/composables/*"]
       },
     },
   

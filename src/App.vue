@@ -1,14 +1,7 @@
 <template>
-    <ChartFlow />
-    <header>
-        h
-        <SvgIcon nameId="0--0--0" />
-    </header>
-    <main>
-        m
-    </main>
-    <TreeGraph />
-
+    <AppDefaultLayout>
+        <router-view></router-view>
+    </AppDefaultLayout>
 </template>
 <script src="./App.ts">
 /*

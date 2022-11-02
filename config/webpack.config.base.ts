@@ -22,7 +22,7 @@ module.exports = (env: {[key: string]: boolean}) => {
             clean               : true,
             filename            : '[name][contenthash].js',
             assetModuleFilename : 'images/[hash][ext][query]',
-            publicPath          : '/',
+            publicPath          : IS_DEV ? '/' : './',
         },
 
         resolve: {
