@@ -4,9 +4,7 @@
         <a href="s">s</a>
     </header>
     <div class="constructor-container">
-        <nav class="toolbar constructor-container__item">
-        nav
-        </nav>
+        <TheNavbar />
         <main class="flowchart-column constructor-container__item">
             <slot />
         </main>
@@ -15,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-
+import { TheNavbar } from '~/components'
 
 </script>
 

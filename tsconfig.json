@@ -19,7 +19,7 @@
   
       "paths": {
         "@t/*": ["./@types/*"],
-        "@c/*": ["./src/components/*"],
+        "~/*": ["./src/*"],
         "styles/*": ["./src/scss/*"],
         "@i/*": ["./src/assets/icons/*"],
         "@cs/*": ["./src/composables/*"]

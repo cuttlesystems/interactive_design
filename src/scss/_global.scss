@@ -3,6 +3,7 @@ body {
   height: 100%;
   font-family: "Open Sans";
   font-weight: 400;
+  background-color: #f2f5f5;
 }
 
 .wrapper {
@@ -23,6 +24,10 @@ body {
   margin: 0 auto;
   padding: 0 15px;
 }
+
+
+
+
 @include b(paint__bg) {
   &--blue {
     background: rgba(103, 205, 224, 0.15);
@@ -115,4 +120,29 @@ body {
   font-weight: 600;
   font-size: 16px;
   line-height: 22px;
+}
+
+
+@include b(unselectable) {
+  user-select: none;
+}
+.strip-text{
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.scrollable {
+  overflow: auto;
+  height: calc(100vh - 75px);
+}
+.scrollable::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollable::-webkit-scrollbar-thumb {
+  border-radius: 4px/2;
+  background-color: #00000014;
+}
+.scrollable::-webkit-scrollbar-track {
+  background-color: transparent;
 }

@@ -120,7 +120,7 @@ enum BOUND {
     LEFT_BOUND = 1424,
     RIGHT_BOUND = -6000,
     TOP_BOUND = 600,
-    BOTTOM_BOUND = -6166.4
+    BOTTOM_BOUND = -5990
 }
 
 class ManageConstructorMap implements IManageConstuctorMap {
@@ -176,7 +176,7 @@ class ManageConstructorMap implements IManageConstuctorMap {
     }
 
     onMouseMove(ev) {
-        console.log('first')
+
         if ("ontouchstart" in document.documentElement)  {
             this.#mouseMoveXPosition = ev.touches[0].pageX;         // edge document === getboundrect.x
             this.#mouseMoveYPosition = ev.touches[0].pageY;
@@ -185,8 +185,8 @@ class ManageConstructorMap implements IManageConstuctorMap {
             this.#mouseMoveYPosition = ev.pageY;
         }
 
-        this.computedDistanceX = this.#mouseMoveXPosition - this.#startPositionX + this.#xOffset;
-        this.computedDistanceY = this.#mouseMoveYPosition - this.#startPositionY + this.#yOffset;
+        this.computedDistanceX = this.#mouseMoveXPosition - this.#startPositionX + this.#xOffset - 100;
+        this.computedDistanceY = this.#mouseMoveYPosition - this.#startPositionY + this.#yOffset - 100;
 
         if (this.computedDistanceX < BOUND.LEFT_BOUND && this.computedDistanceX > BOUND.RIGHT_BOUND) {
             this.distancePositionX = this.computedDistanceX;
@@ -221,7 +221,7 @@ class ManageConstructorMap implements IManageConstuctorMap {
     }
 
     onMouseUp() {
-        removeEventListener('mousemove', this.#onMouseMoveHandler)
+        this.#onMouseMoveHandler! && removeEventListener('mousemove', this.#onMouseMoveHandler)
     }
 
 }
