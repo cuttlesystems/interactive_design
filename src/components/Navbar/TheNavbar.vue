@@ -1,58 +1,50 @@
 <template>
     <nav class="toolbar constructor-container__item">
         <ul class="structure-elements scrollable">
-            <li class="structure-elements__item">
-                <img src="https://login.sendpulse.com/automation/static/images/flow-editor/sp-i-c-email.svg" alt="Icon" class="structure-elements__icon" />
-                <span class="element__title strip-text">Email</span>
-            </li>
-            <li class="structure-elements__item">
-                <img src="https://login.sendpulse.com/automation/static/images/flow-editor/sp-i-c-email.svg" alt="Icon" class="structure-elements__icon" />
-                <span class="element__title strip-text">Email</span>
-            </li>
-            <li class="structure-elements__item">
-                <img src="https://login.sendpulse.com/automation/static/images/flow-editor/sp-i-c-email.svg" alt="Icon" class="structure-elements__icon" />
-                <span class="element__title strip-text">Email</span>
-            </li>
-            <li class="structure-elements__item">
-                <img src="https://login.sendpulse.com/automation/static/images/flow-editor/sp-i-c-email.svg" alt="Icon" class="structure-elements__icon" />
-                <span class="element__title strip-text">Email</span>
-            </li>
-            <li class="structure-elements__item">
-                <img src="https://login.sendpulse.com/automation/static/images/flow-editor/sp-i-c-email.svg" alt="Icon" class="structure-elements__icon" />
-                <span class="element__title strip-text">Email</span>
-            </li>
-            <li class="structure-elements__item">
-                <img src="https://login.sendpulse.com/automation/static/images/flow-editor/sp-i-c-email.svg" alt="Icon" class="structure-elements__icon" />
-                <span class="element__title strip-text">Email</span>
-            </li>
-            <li class="structure-elements__item">
-                <img src="https://login.sendpulse.com/automation/static/images/flow-editor/sp-i-c-email.svg" alt="Icon" class="structure-elements__icon" />
-                <span class="element__title strip-text">Email</span>
-            </li>
-            <li class="structure-elements__item">
-                <img src="https://login.sendpulse.com/automation/static/images/flow-editor/sp-i-c-email.svg" alt="Icon" class="structure-elements__icon" />
-                <span class="element__title strip-text">Email</span>
-            </li>
-            <li class="structure-elements__item">
-                <img src="https://login.sendpulse.com/automation/static/images/flow-editor/sp-i-c-email.svg" alt="Icon" class="structure-elements__icon" />
-                <span class="element__title strip-text">Email</span>
+            <li class="structure-elements__item" v-for="( item ) of rawData" :key="item.name" @click="selectConstructor($event, item)" :data-name="item.name">
+                <img :src="item.src" alt="Icon" class="structure-elements__icon" />
+                <span class="element__title strip-text">{{ item.name }}</span>
             </li>
         </ul>
     </nav>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "@vue/runtime-core";
-import { ref } from 'vue'
-import type { Ref } from 'vue'
+import { defineComponent, unref } from "@vue/runtime-core";
+import { ref, toRefs, toRef } from 'vue';
+
+import type { Ref } from 'vue';
+
+const rawData = [
+    {
+        name: 'Email',
+        src: 'https://login.sendpulse.com/automation/static/images/flow-editor/sp-i-c-sms.svg',
+    },
+    {
+        name: 'SMS',
+        src: 'https://login.sendpulse.com/automation/static/images/flow-editor/sp-i-c-email.svg'
+    }
+]
 
 export default defineComponent({
     props: {
         // message: String
     },
-    emits: [''],
-    setup(props, { emit }){
 
+    emits: ['getSelectedConstructor'],
+    
+    setup(props, { emit , attrs, slots, expose }){
+        
+        function selectConstructor(ev, item){   // remove reactivity
+
+                 emit('getSelectedConstructor', item)
+            
+        }
+
+        return {
+            rawData,
+            selectConstructor,
+        }
     }
 })
 
@@ -82,6 +74,13 @@ export default defineComponent({
             color: #5c6a70;
             padding: 12px;
             line-height: 1.1;
+            & * {
+                pointer-events: none;
+            }
+            &:active {
+                opacity: 0.5;
+                margin-bottom: 15px;
+            }
         }
         @include e(icon){
             display: block;

@@ -107,9 +107,11 @@
 //     }
 // }
 
+import { onUnmounted, reactive } from "vue";
+
 // onDown, onMove, onUp
 
-interface IManageConstuctorMap {
+export interface IManageConstuctorMap {
     moveBlockEl: HTMLDivElement;
     onMouseDown: (ev: MouseEvent) => void;
     onMouseMove: (ev: MouseEvent) => void;
@@ -122,6 +124,12 @@ enum BOUND {
     TOP_BOUND = 600,
     BOTTOM_BOUND = -5990
 }
+
+export const chartFlowPosition = reactive({
+    x: 0,
+    y: 0,
+    isClicked: false
+})
 
 class ManageConstructorMap implements IManageConstuctorMap {
     #_isMouseDown: boolean;
@@ -143,11 +151,19 @@ class ManageConstructorMap implements IManageConstuctorMap {
     distancePositionX: Number;
     distancePositionY: Number;
 
+    onMouseDownId: (ev:MouseEvent) => void
+    onMouseUpId: (ev:MouseEvent) => void
+
     #onMouseMoveHandler: (ev: MouseEvent) => void;
 
     constructor(protected _moveBlockEl: HTMLDivElement){
-        _moveBlockEl.addEventListener('mousedown', this.onMouseDown.bind(this))
-        addEventListener('mouseup', this.onMouseUp.bind(this))
+
+        this.onMouseUpId = this.onMouseUp.bind(this)
+
+        this.onMouseDownId = this.onMouseDown.bind(this);
+        _moveBlockEl.addEventListener('mousedown', this.onMouseDownId, false );
+        addEventListener('mouseup', this.onMouseUpId);
+
     }
 
     get moveBlockEl() {
@@ -155,24 +171,33 @@ class ManageConstructorMap implements IManageConstuctorMap {
     }
 
     onMouseDown(ev) {
-        
-        this.#_isMouseDown = true
-        this.#_reduceAF    = true
-        this._moveBlockEl.style.transition = 'none 0s ease 0s';
 
-        this.#xOffset = this._moveBlockEl.getBoundingClientRect().x;     // left  1424 > n right -6000 < n , top 600 > n , bottom -6166.4 < n
-        this.#yOffset = this._moveBlockEl.getBoundingClientRect().y;
+        if(ev.currentTarget === ev.target){
+            chartFlowPosition.isClicked = true
+            
+            this.#_isMouseDown = true
+            this.#_reduceAF    = true
+            this._moveBlockEl.style.transition = 'none 0s ease 0s';
+    
+            this.#xOffset = this._moveBlockEl.getBoundingClientRect().x;     // left  1424 > n right -6000 < n , top 600 > n , bottom -6166.4 < n
+            this.#yOffset = this._moveBlockEl.getBoundingClientRect().y;
+    
+            if ("ontouchstart" in document.documentElement) {
 
-        if ("ontouchstart" in document.documentElement) {
-            this.#startPositionX = ev.touches[0].pageX;
-            this.#startPositionY = ev.touches[0].pageY;
-        } else {
-            this.#startPositionX = ev.pageX;
-            this.#startPositionY = ev.pageY;
+                this.#startPositionX = ev.touches[0].pageX;
+                this.#startPositionY = ev.touches[0].pageY;
+
+            } else {
+
+                this.#startPositionX = ev.pageX;
+                this.#startPositionY = ev.pageY;
+
+            }
+            this.#onMouseMoveHandler = this.onMouseMove.bind(this)
+            addEventListener('mousemove', this.#onMouseMoveHandler, { passive: false })
+
         }
-        this.#onMouseMoveHandler = this.onMouseMove.bind(this)
-        addEventListener('mousemove', this.#onMouseMoveHandler, { passive: false })
-
+        
     }
 
     onMouseMove(ev) {
@@ -185,13 +210,15 @@ class ManageConstructorMap implements IManageConstuctorMap {
             this.#mouseMoveYPosition = ev.pageY;
         }
 
-        this.computedDistanceX = this.#mouseMoveXPosition - this.#startPositionX + this.#xOffset - 100;
-        this.computedDistanceY = this.#mouseMoveYPosition - this.#startPositionY + this.#yOffset - 100;
+        this.computedDistanceX = this.#mouseMoveXPosition - this.#startPositionX + this.#xOffset - 110;
+        this.computedDistanceY = this.#mouseMoveYPosition - this.#startPositionY + this.#yOffset - 85;
 
         if (this.computedDistanceX < BOUND.LEFT_BOUND && this.computedDistanceX > BOUND.RIGHT_BOUND) {
+            
             this.distancePositionX = this.computedDistanceX;
         }
         if (this.computedDistanceY > BOUND.BOTTOM_BOUND && this.computedDistanceY < BOUND.TOP_BOUND) {
+            
             this.distancePositionY = this.computedDistanceY;
         }
 
@@ -216,11 +243,16 @@ class ManageConstructorMap implements IManageConstuctorMap {
     }
 
     computedDistance() {
-        return `matrix(1, 0, 0, 1, ${this.distancePositionX}, ${this.distancePositionY})`
+        return `matrix(1, 0, 0, 1, ${this.distancePositionX}, ${this.distancePositionY})`           // 0.5 - 1.5 ZOOM
         // return `translateX(${this.distancePositionX}px) translateY(${this.distancePositionY}px) scale(1.7) translateZ(0px)`;
     }
 
     onMouseUp() {
+        chartFlowPosition.isClicked = false
+        
+        chartFlowPosition.x         = this.computedDistanceX || 0;
+        chartFlowPosition.y         = this.computedDistanceY || 0;
+        
         this.#onMouseMoveHandler! && removeEventListener('mousemove', this.#onMouseMoveHandler)
     }
 

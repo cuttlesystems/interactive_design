@@ -1,23 +1,99 @@
 <template>
     <header class="constructor-header">
+      
         header
+      
         <a href="s">s</a>
     </header>
     <div class="constructor-container">
-        <TheNavbar />
+        <TheNavbar @getSelectedConstructor="getSelectedConstructor" />
         <main class="flowchart-column constructor-container__item">
-            <slot />
+            <slot :selectedConstructor="selectedConstructor" 
+                  :isMoved="isMoved"
+                  :mousePosition="mousePosition"
+                  />
         </main>
     </div>
     
 </template>
 
 <script setup lang="ts">
+
 import { TheNavbar } from '~/components'
+import {useMouse} from '@cs/useMouse'
+import { isRef, reactive, ref, watch } from '@vue/runtime-core'
+import { useEventListener } from '~/composables/useEventListener'
+
+
+const selectedConstructor = ref()
+let   isMoved             = ref(false)
+const mousePosition = reactive({
+    mouseMoveXPosition: 0,
+    mouseMoveYPosition: 0
+})
+    
+// let { mouseMoveXPosition, mouseMoveYPosition } = useMouse();
+
+function getSelectedConstructor( selectedItem ){            // mouseup fired before click
+
+    // selectedConstructor.value = selectedItem;
+
+}
+
+// watch(
+//     [ selectedConstructor, mouseMoveXPosition, mouseMoveYPosition ],
+//     ([s, x, y],[prevS, prevX, prevY]) => {
+//         // create
+//         if(s && (x !== prevX || y !== prevY)) {
+//             console.log('first')
+
+//         }
+
+//     },
+//     {flush: 'post'}
+// )
+
+
+
+function mouseDownHandler(ev: MouseEvent & {target: HTMLElement}) {
+    
+    // if( ev.target!.classList.contains('structure-elements__item') ) {
+        
+        selectedConstructor.value = ev.target;
+        addEventListener('mousemove', mouseMoveHandler)
+    // }
+    
+}
+
+function mouseMoveHandler(ev: MouseEvent) {
+
+    mousePosition.mouseMoveXPosition = ev.pageX;
+    mousePosition.mouseMoveYPosition = ev.pageY;
+    
+    console.log('fired')
+    
+    if(selectedConstructor.value.classList.contains('structure-elements__item')){
+        isMoved.value = true;
+    }
+    
+}
+
+function mouseUpHandler(ev: MouseEvent) {
+
+    isMoved.value = false;
+    removeEventListener('mousemove', mouseMoveHandler)
+}
+
+// clean up
+
+useEventListener({ target: window, event: 'mousedown', cb: mouseDownHandler })
+useEventListener({ target: window, event: 'mouseup', cb: mouseUpHandler })
+
 
 </script>
 
 <style lang="scss">
+
 @include b(constructor-header) {
     box-shadow: 0 4px 10px #00000026;
     background-color: #0097b7;

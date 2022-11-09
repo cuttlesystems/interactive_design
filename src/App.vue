@@ -1,6 +1,8 @@
 <template>
-    <AppDefaultLayout>
-        <router-view></router-view>
+    <AppDefaultLayout v-slot="slotProps">
+        <router-view
+            v-bind="slotProps"
+        ></router-view>
     </AppDefaultLayout>
 </template>
 <script src="./App.ts">
