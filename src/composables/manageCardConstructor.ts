@@ -72,24 +72,24 @@ class ManageCardConstructor implements IManageCardConstructor {
         this.computedPositionX = this.#constructorPosition.x + (ev.pageX - this.#startPositionX ) - chartFlowPosition.x - 110
         this.computedPositionY = this.#constructorPosition.y + (ev.pageY - this.#startPositionY ) - chartFlowPosition.y - 85
 
-        if(this.#countX == 31 && this.computedPositionX > 0 ){
+        if(this.#countX == 5 && this.computedPositionX > 0 ){
             
             this.#selectedConstructor!.style.left = `${this.computedPositionX}px`
             this.#countX = 1
 
         }
 
-        if(this.#countY == 31 && this.computedPositionY > 0){
+        if(this.#countY == 5 && this.computedPositionY > 0){
 
             this.#selectedConstructor!.style.top = `${this.computedPositionY}px`
             this.#countY = 1
 
         }
 
-        if(this.#countX > 31){
+        if(this.#countX > 5){
             this.#countX = 1
         }
-        if(this.#countY > 31){
+        if(this.#countY > 5){
             this.#countY = 1
         }
         
@@ -101,11 +101,16 @@ class ManageCardConstructor implements IManageCardConstructor {
 
     onMouseUp(ev : MouseEvent) {
 
-        if(this.#selectedConstructor!?.classList.contains('flowchart-operator')){
-            constructorPosition.x = this.computedPositionX
-            constructorPosition.y = this.computedPositionY
+        if( this.#selectedConstructor!?.classList.contains('flowchart-operator') ){
+            if(this.computedPositionX > 0 ){
+                constructorPosition.x = this.computedPositionX
+            }
+            if(this.computedPositionY > 0){
+                constructorPosition.y = this.computedPositionY
+            }
             constructorPosition.currentConstructor = this.#selectedConstructor!.dataset.name as string
         }
+        
         this.#selectedConstructor = null
 
         removeEventListener('mousemove', this.mouseMoveId)

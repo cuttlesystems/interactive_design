@@ -4,9 +4,7 @@
             
             <div v-if="constructorList.length" class="flowchart-operators-layer unselectable">
 
-
-                <div v-for="(item) of constructorList" :key="item.name"
-                    class="flowchart-operator operator-trigger op-error"
+                <div v-for="(item) of constructorList" :key="item.name" class="flowchart-operator operator-trigger op-error"
                     :class="[item.className]" 
                     :style="{
                         'top': `${ item.top || mouseMoveYPosition }px`,
@@ -14,6 +12,15 @@
                         }"
                     :data-name="item.name"
                 >
+                    <div class="flowchart-operator-inputs">
+                        <div class="flowchart-operator-connector-set">
+                            <div class="flowchart-operator-connector">
+                                <div class="flowchart-operator-connector-label"></div>
+                                <div class="flowchart-operator-connector-arrow"></div>
+                                <div class="flowchart-operator-connector-small-arrow"></div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="flowchart-operator-title">{{item.name}}</div>
                     <div class="flowchart-operator-body">
                         <p>Выберите контент письма</p>
@@ -21,6 +28,8 @@
                     <div class="flowchart-operator-outputs">
                         <div class="flowchart-operator-connector-set">
                             <div class="flowchart-operator-connector">
+                                <div class="flowchart-operator-connector-label"></div>
+                                <div class="flowchart-operator-connector-arrow"></div>
                                 <div class="flowchart-operator-connector-small-arrow"></div>
                             </div>
                         </div>
@@ -42,6 +51,10 @@
                 </div> -->
                     
             </div>
+
+            <svg ref="constrolLinkLayer" class="flowchart-links-layer">
+                
+            </svg>
 
             <svg class="flowchart-temporary-link-layer" :style="{display:'none'}">
                 <line x1="90" y1="94.42500305175781" x2="148.20001220703125" y2="132.8000030517578" stroke-dasharray="6,6" stroke-width="4" stroke="black" fill="none"></line>
@@ -66,7 +79,17 @@
 /*
     get chartflow position right way, after initialize set static
     single move card flow
-    
+
+    x1,y1  curveX1,curveY1 curveX2,curveY2  x2,y2
+
+    polygon
+    g
+    mask
+
+    define input connector -
+    canvas*
+
+    x1,y1   x1 == curveX1, y1 + 100 === curveY1 &&  x2 === curveX2, y2 - 100 === curveY2  x2,y2
 */
 
 interface ComponentPropsType {
@@ -82,7 +105,7 @@ interface EmitsType {
 
 import { ref, Ref, onMounted, onUnmounted, onUpdated, watch, isReactive, toRefs, computed, reactive, unref, isRef } from 'vue'
 
-import { ManageConstructorMap, ManageCardConstructor, chartFlowPosition } from '~/composables'
+import { ManageConstructorMap, ManageCardConstructor, chartFlowPosition, ManageLinks } from '~/composables'
 import { constructorPosition } from '~/composables/manageCardConstructor';
 
 const props = withDefaults(defineProps<ComponentPropsType>(), {
@@ -96,8 +119,11 @@ const props = withDefaults(defineProps<ComponentPropsType>(), {
 
 const flowchart: Ref<HTMLElement | null> = ref(null);
 const flowChartPosition: Ref<DOMRect  | null> = ref(null);
-let controlMap = ref({});
-let controlConstructor = ref({});
+const controlMap = ref({});
+const controlConstructor = ref({});
+const controlLink = ref({});
+const constrolLinkLayer = ref({});
+
 
 const constructorList: Ref<Array<{
     name: string,
@@ -147,7 +173,7 @@ watch(() => props.selectedConstructor, (selectedConstr,prevSelectedConstr) => {
     console.log('indeside selectedConstr')
     if(props.selectedConstructor.classList.contains('flowchart-operator')){
         
-        new ManageCardConstructor( );       // props.selectedConstructor as HTMLDivElement, props.mousePosition, props.isMoved 
+        new ManageCardConstructor( );           // props.selectedConstructor as HTMLDivElement, props.mousePosition, props.isMoved 
         
     }
 
@@ -205,13 +231,16 @@ watch(() => chartFlowPosition,
 onMounted(() => {
     flowChartPosition.value = flowchart.value!.getBoundingClientRect();
 
-    controlMap.value = new ManageConstructorMap(flowchart.value as HTMLDivElement);
+    controlMap.value         = new ManageConstructorMap(flowchart.value as HTMLDivElement);
 
     controlConstructor.value = new ManageCardConstructor( );
+
+    controlLink.value        = new ManageLinks( constrolLinkLayer.value as SVGElement );
+
+
     console.log(flowChartPosition.value)
     console.log(controlMap.value)
     // controlMap.initialize
-    
 })
 
 
@@ -343,11 +372,40 @@ onUnmounted(() => {
             line-height: 1.3;
             word-break: break-word;
     }
+    @include b(flowchart-operator-inputs){
+         pointer-events: auto;
+         & .flowchart-operator-connector-arrow {
+            top: -9px;
+        }
+    }
     @include b(flowchart-operator-outputs){
         display: flex;
         flex-wrap: nowrap;
         width: 100%;
         max-width: 170px;
+        pointer-events: auto;
+        & .flowchart-operator-connector-arrow {
+            top: 0;
+        }
+      
+    }
+    @include b(flowchart-operator-connector-label) {
+        position: absolute;
+        width: 180px;
+        height: 30px;
+        top: -15px;
+        color: transparent;
+        opacity: 0;
+    }
+    @include b(flowchart-operator-connector-arrow) {
+        width: 100%;
+        height: 18px;
+        background: transparent;
+        position: absolute;
+        z-index: 3;
+        .flowchart-operator-inputs & {
+            top: -9px;
+        }
     }
     @include b(flowchart-operator-connector-set){
         flex-grow: 1;
@@ -358,6 +416,12 @@ onUnmounted(() => {
         padding-top: 1px;
         padding-bottom: 1px;
         margin-left: -4px;
+        
+        &:hover .flowchart-operator-connector-small-arrow {
+            transform: scale(1.2);
+            background: #007D96;
+            transition: all 30ms ease-in-out 15ms;
+        }
     }
     @include b(flowchart-operator-connector-small-arrow) {
         width: 12px;
@@ -367,8 +431,18 @@ onUnmounted(() => {
         background: #009FC1;
         border-radius: 50%;
         box-shadow: 0 0 0 3px #fff, 0 0 0 4px #fff, 0 5px 6px #00000080;
-        pointer-events: none;
         z-index: 3;
+        pointer-events: none;
+    }
+
+    @include b(flowchart-links-layer){
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        /* test */
+        pointer-events: none;
     }
     
 

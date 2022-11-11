@@ -151,6 +151,8 @@ class ManageConstructorMap implements IManageConstuctorMap {
     distancePositionX: Number;
     distancePositionY: Number;
 
+    #moveMapId: () => void
+
     onMouseDownId: (ev:MouseEvent) => void
     onMouseUpId: (ev:MouseEvent) => void
 
@@ -161,7 +163,7 @@ class ManageConstructorMap implements IManageConstuctorMap {
         this.onMouseUpId = this.onMouseUp.bind(this)
 
         this.onMouseDownId = this.onMouseDown.bind(this);
-        _moveBlockEl.addEventListener('mousedown', this.onMouseDownId, false );
+        _moveBlockEl.addEventListener('mousedown', this.onMouseDownId );
         addEventListener('mouseup', this.onMouseUpId);
 
     }
@@ -171,7 +173,7 @@ class ManageConstructorMap implements IManageConstuctorMap {
     }
 
     onMouseDown(ev) {
-
+        
         if(ev.currentTarget === ev.target){
             chartFlowPosition.isClicked = true
             
@@ -224,9 +226,11 @@ class ManageConstructorMap implements IManageConstuctorMap {
 
         if (this.#_reduceAF && this.#_isMouseDown) {
             this.#_reduceAF = false;
+
+            this.#moveMapId = this.moveMap.bind(this)
       
             this.#idAF && cancelAnimationFrame(this.#idAF);
-            this.#idAF = requestAnimationFrame(this.moveMap.bind(this));
+            this.#idAF = requestAnimationFrame(this.#moveMapId);
         }
     }
     // backface-visibility: hidden; transform-origin: 50% 50%; cursor: move; transition: none 0s ease 0s;
@@ -238,8 +242,7 @@ class ManageConstructorMap implements IManageConstuctorMap {
         this._moveBlockEl.style.cursor = 'grabbing';
         this._moveBlockEl.style.transition = 'none 0s ease 0s';
 
-
-        this.#idAF = requestAnimationFrame(this.moveMap.bind(this)); 
+        this.#idAF = requestAnimationFrame(this.#moveMapId); 
     }
 
     computedDistance() {
