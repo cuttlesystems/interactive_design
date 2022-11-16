@@ -1,5 +1,5 @@
 import { isRef, reactive, toRef } from "vue";
-import { chartFlowPosition } from "./manageChartFlow";
+import { chartFlowPosition, ConstructorPositionType } from "./manageChartFlow";
 
 type MousePosition = {
     x: MouseEvent['pageX'];
@@ -11,6 +11,18 @@ interface IManageCardConstructor {
     // cardConstructor: HTMLDivElement;
     
 }
+
+type DotsPosition = {
+    output: {
+        x: number;
+        y: number;
+    },
+    input: {
+        x: number;
+        y: number;
+    }
+}
+
 
 export const constructorPosition = reactive({
     x: 0,
@@ -36,7 +48,20 @@ class ManageCardConstructor implements IManageCardConstructor {
     mouseUpId: (ev) => void;
     mouseMoveId: (ev) => void;
 
-    constructor() {
+    path: SVGPathElement | null;
+    positionPath: Array<string>
+    
+    // TEST
+
+    computedOutputLinkX: number;
+    computedOutputLinkY: number;
+    computedInputLinkX: number;
+    computedInputLinkY: number;
+
+    dotsPosition: DotsPosition;
+
+    constructor(private readonly _constrolLinkLayer: SVGElement) {
+
         this.mouseDownId = this.onMouseDown.bind(this)
         this.mouseUpId   = this.onMouseUp.bind(this)
         this.mouseMoveId   = this.onMouseMove.bind(this)
@@ -54,15 +79,36 @@ class ManageCardConstructor implements IManageCardConstructor {
 
         if((ev.target as HTMLDivElement).classList.contains('flowchart-operator')){
 
+            /*
+                output | input
+            */
+
             this.#startPositionX = ev.pageX;
             this.#startPositionY = ev.pageY;
             this.#selectedConstructor = ev.target as HTMLDivElement;
 
             this.#constructorPosition = this.#selectedConstructor.getBoundingClientRect()
 
-            
-            addEventListener('mousemove', this.mouseMoveId)
 
+            this.path = this._constrolLinkLayer.querySelector(`#${this.#selectedConstructor?.dataset.link?.replace(/(--output|--input)/g,'')}`);
+            if(this.path){
+                
+                this.positionPath = this.path!.getAttribute('d')?.split(' ') as Array<string>
+                this.dotsPosition = {
+                    output: {
+                        x: parseFloat(this.positionPath[0].replace(/(^M|\,.*)/,'')),
+                        y: parseFloat(this.positionPath[0].replace(/^M.*\,/,'')),
+                    },
+                    input: {
+                        x: parseFloat(this.positionPath[3].replace(/\,.+/,'')),
+                        y: parseFloat(this.positionPath[3].replace(/.+\,/,''))
+                    }
+                }
+
+            }
+
+            addEventListener('mousemove', this.mouseMoveId)
+            
         }
 
     }
@@ -71,6 +117,8 @@ class ManageCardConstructor implements IManageCardConstructor {
         
         this.computedPositionX = this.#constructorPosition.x + (ev.pageX - this.#startPositionX ) - chartFlowPosition.x - 110
         this.computedPositionY = this.#constructorPosition.y + (ev.pageY - this.#startPositionY ) - chartFlowPosition.y - 85
+
+        
 
         if(this.#countX == 5 && this.computedPositionX > 0 ){
             
@@ -97,6 +145,32 @@ class ManageCardConstructor implements IManageCardConstructor {
         this.#countY++
         // console.log(this.#startPositionX = ev.pageX,
         //     this.#startPositionY = ev.pageY,)
+
+
+        // MOVE LINK
+
+        // fc__path_#idx-- (output | input) -> #idx = 1 -- AUTOINCREMENT
+        if( this.#selectedConstructor?.dataset.link ){
+            
+            this.computedOutputLinkX = this.dotsPosition.output!.x + (ev.pageX - this.#startPositionX )  
+            this.computedOutputLinkY = this.dotsPosition.output!.y + (ev.pageY - this.#startPositionY ) 
+
+            this.computedInputLinkX = this.dotsPosition.input!.x + (ev.pageX - this.#startPositionX )  
+            this.computedInputLinkY = this.dotsPosition.input!.y + (ev.pageY - this.#startPositionY ) 
+
+            if(/output/g.test((this.#selectedConstructor?.dataset.link as string))){
+
+                this.path!.setAttribute('d', `M${this.computedOutputLinkX },${this.computedOutputLinkY } C${this.computedOutputLinkX },${this.computedOutputLinkY + 100 } ${this.dotsPosition.input!.x },${this.dotsPosition.input!.y - 100 } ${this.dotsPosition.input!.x },${this.dotsPosition.input!.y }`)
+     
+            } else if(/input/g.test((this.#selectedConstructor?.dataset.link as string))){
+
+                this.path!.setAttribute('d', `M${this.dotsPosition.output!.x },${this.dotsPosition.output!.y } C${this.dotsPosition.output!.x },${this.dotsPosition.output!.y + 100 } ${this.computedInputLinkX },${this.computedInputLinkY - 100 } ${this.computedInputLinkX },${this.computedInputLinkY }`)
+
+            }
+        }
+        
+        
+        
     }
 
     onMouseUp(ev : MouseEvent) {

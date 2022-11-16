@@ -124,8 +124,13 @@ enum BOUND {
     TOP_BOUND = 600,
     BOTTOM_BOUND = -5990
 }
+export interface ConstructorPositionType {
+    x: number;
+    y: number;
+    isClicked: boolean;
+}
 
-export const chartFlowPosition = reactive({
+export const chartFlowPosition: ConstructorPositionType = reactive({
     x: 0,
     y: 0,
     isClicked: false

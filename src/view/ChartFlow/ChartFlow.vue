@@ -90,6 +90,10 @@
     canvas*
 
     x1,y1   x1 == curveX1, y1 + 100 === curveY1 &&  x2 === curveX2, y2 - 100 === curveY2  x2,y2
+
+    x1,y1 -> path x1,y1 curveX1,curveY1
+    x2,y2 -> path curveX2,curveY2 x2,y2
+    
 */
 
 interface ComponentPropsType {
@@ -136,7 +140,7 @@ const constructorList: Ref<Array<{
 
 watch(() => props.isMoved,(moved,prevModev) => {
     console.log('moved', props.isMoved)
-    if( props.selectedConstructor.classList.contains('structure-elements__item' )){
+    if( props.selectedConstructor.classList.contains( 'structure-elements__item' )){
 
         if(props.isMoved){
 
@@ -173,7 +177,7 @@ watch(() => props.selectedConstructor, (selectedConstr,prevSelectedConstr) => {
     console.log('indeside selectedConstr')
     if(props.selectedConstructor.classList.contains('flowchart-operator')){
         
-        new ManageCardConstructor( );           // props.selectedConstructor as HTMLDivElement, props.mousePosition, props.isMoved 
+        // new ManageCardConstructor( );           // props.selectedConstructor as HTMLDivElement, props.mousePosition, props.isMoved 
         
     }
 
@@ -229,17 +233,19 @@ watch(() => chartFlowPosition,
 // const emits = defineEmits([''])     // pass name emit -> cb
 
 onMounted(() => {
-    flowChartPosition.value = flowchart.value!.getBoundingClientRect();
+    
+    flowChartPosition.value  = flowchart.value!.getBoundingClientRect();
 
-    controlMap.value         = new ManageConstructorMap(flowchart.value as HTMLDivElement);
+    controlMap.value         = new ManageConstructorMap( flowchart.value as HTMLDivElement );
 
-    controlConstructor.value = new ManageCardConstructor( );
+    controlConstructor.value = new ManageCardConstructor( constrolLinkLayer.value as SVGElement );
 
-    controlLink.value        = new ManageLinks( constrolLinkLayer.value as SVGElement );
+    controlLink.value        = new ManageLinks( constrolLinkLayer.value as SVGElement, chartFlowPosition );
 
 
-    console.log(flowChartPosition.value)
-    console.log(controlMap.value)
+    console.log( flowChartPosition.value );
+    console.log( controlMap.value );
+    console.log( controlLink.value, 'link' );
     // controlMap.initialize
 })
 
@@ -253,10 +259,13 @@ onMounted(() => {
 
 onUnmounted(() => {
     (controlMap.value as ManageConstructorMap).moveBlockEl.removeEventListener('mousedown',(controlMap.value as ManageConstructorMap).onMouseDownId );
-    removeEventListener('mouseup',(controlMap.value as ManageConstructorMap).onMouseUpId );
+    removeEventListener('mouseup',( controlMap.value as ManageConstructorMap).onMouseUpId );
 
-    removeEventListener('mousedown', (controlConstructor.value as ManageCardConstructor).mouseDownId)
-    removeEventListener('mouseup', (controlConstructor.value as ManageCardConstructor).mouseUpId)
+    removeEventListener('mousedown', ( controlConstructor.value as ManageCardConstructor).mouseDownId );
+    removeEventListener('mouseup', ( controlConstructor.value as ManageCardConstructor).mouseUpId );
+
+    removeEventListener('mouseup', (controlLink.value as ManageLinks).onMouseDownId);
+    removeEventListener('mousedown', (controlLink.value as ManageLinks).onMouseUpHandlerId);
 })
 
 
@@ -374,6 +383,9 @@ onUnmounted(() => {
     }
     @include b(flowchart-operator-inputs){
          pointer-events: auto;
+         & .flowchart-operator-connector-small-arrow {
+            top: -9px;
+         }
          & .flowchart-operator-connector-arrow {
             top: -9px;
         }
