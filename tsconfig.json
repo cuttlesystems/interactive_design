@@ -18,11 +18,12 @@
       "noImplicitThis": false,
   
       "paths": {
-        "@t/*": ["./@types/*"],
-        "~/*": ["./src/*"],
-        "styles/*": ["./src/scss/*"],
-        "@i/*": ["./src/assets/icons/*"],
-        "@cs/*": ["./src/composables/*"]
+        "@t/*": ["@types/*"],
+        "~/*": ["src/*"],
+        "styles/*": ["src/scss/*"],
+        "@i/*": ["src/assets/icons/*"],
+        "@cs/*": ["src/composables/*"],
+        "api/*": ["src/api/*"],
       },
     },
   

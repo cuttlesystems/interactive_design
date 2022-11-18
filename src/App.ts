@@ -1,4 +1,4 @@
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 
 import {AppComponentProps, AppComponentData} from '@t/types'
 
@@ -13,5 +13,11 @@ export default defineComponent<AppComponentProps,AppComponentData>({
         AppDefaultLayout
     },
 
-    
+    setup(){
+        const blankRouteList = ref(['login'])
+
+        return {
+            blankRouteList
+        }
+    }
 })
