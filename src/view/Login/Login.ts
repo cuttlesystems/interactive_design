@@ -27,12 +27,12 @@ export default defineComponent<LoginState,LoginProps>({
 
         console.log(store.state, 'store')
         const state = reactive({
-            email: '',
+            username: '',
             password: ''
         })
 
         const rules = computed(() => ({
-            email:  { required },
+            username:  { required },
             password: { required }
         }))
 
@@ -41,7 +41,7 @@ export default defineComponent<LoginState,LoginProps>({
         function submitHandler() {
 
             store.dispatch('authReducer/' + ActionTypes.LOGIN, {
-                email: state.email,
+                username: state.username,
                 password: state.password
             }).then(() => {
                 store.state.authReducer.authToken && router.push({name: 'chart'})

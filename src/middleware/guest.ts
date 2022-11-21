@@ -1,7 +1,7 @@
 
 
-export default function guest({ next, store }) {
-    if( store.state.authReducer.authToken ){
+export default function guest({ next, store, authToken }) {
+    if( authToken ){
         return next({
             name: 'chart'
         })

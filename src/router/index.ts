@@ -7,6 +7,7 @@ import { useStore } from "~/store";
 import { ActionTypes } from "~/store/modules/action-types";
 import middlewarePipeline from "~/middleware/middlewarePipeline";
 import store from '~/store'
+import LocalStorageService from "~/utils/LocalStorageService";
 
 const routes: Array<RouteRecordRaw> = [
     { name: 'login', path: '/login', component: Login, 
@@ -36,12 +37,14 @@ router.beforeEach((to, from, next) => {
     if(!store.state.initialized){
         store.dispatch(ActionTypes.INITIALIZE_APP)
     }
+    const authToken = LocalStorageService.getToken();
 
     const context = {
         to,
         from,
         next,
-        store
+        store,
+        authToken
     }
     return middleware[0]({
         ...context,

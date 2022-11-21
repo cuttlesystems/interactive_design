@@ -4,8 +4,8 @@
             <form @submit.prevent="submitHandler" class="form">
                 <h1 class="form__title">Welcome to <br />Cuttle System</h1>
                 <input type="text" name="username" class="form__input" placeholder="Введите логин"
-                    v-model="state.email" />
-                <div class="form__input--error" v-if="v$.email.$dirty && v$.email">{{v$.email.$errors[0].$message}}</div>
+                    v-model="state.username" />
+                <div class="form__input--error" v-if="v$.username.$dirty && v$.username">{{v$.username.$errors[0].$message}}</div>
                 <input type="password" name="password" class="form__input" placeholder="Введите пароль"
                     v-model="state.password" />
                 <input type="submit" class="form__btn" />
@@ -16,10 +16,11 @@
 
 <script src="./Login.ts" lang="ts">
 
-/*
+/*      
 *       middlewarePipline -> vuex -> interceptors DAL layer -> Global feat to mixin --> api
 *       ChartFlow   ---  nginx
-*
+*       
+        customRef() track, trigger
 */
 
 </script>

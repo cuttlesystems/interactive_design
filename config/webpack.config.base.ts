@@ -123,18 +123,18 @@ module.exports = (env: {[key: string]: boolean}) => {
             client: {
                 overlay: true,
             },
-            // proxy: {
-            //     '/api': {
-            //         // target: `${config.devBackend.protocol}://${
-            //         //     config.devBackend.host
-            //         // }:${config.devBackend.port}`,
-            //         target: 'https://leonraize.university',
-            //         secure: false,
-            //         changeOrigin: true,
-            //         proxyTimeout: 5 * 60 * 1000,
-            //         timeout: 5 * 60 * 1000,
-            //     },
-            // }
+            proxy: {
+                '/api': {
+                    // target: `${config.devBackend.protocol}://${
+                    //     config.devBackend.host
+                    // }:${config.devBackend.port}`,
+                    target: 'http://127.0.0.1:8000',
+                    secure: false,
+                    changeOrigin: true,
+                    proxyTimeout: 5 * 60 * 1000,
+                    timeout: 5 * 60 * 1000,
+                },
+            }
         },
 
         optimization: {

@@ -26,14 +26,17 @@ const debug = process.env.NODE_ENV !== 'production';
 
 
 export default createStore<RootState>({
+    
     state: {
         initialized: false
     } as RootState,
+
     mutations:{
         [MutationTypes.INITIALIZE](state){
             state.initialized = true;
         }
     },
+
     actions:{
         [ActionTypes.INITIALIZE_APP](context){
             context.commit(MutationTypes.INITIALIZE)

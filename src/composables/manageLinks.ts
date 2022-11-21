@@ -43,9 +43,10 @@ class ManageLinks implements IManageLinks{
     }
 
     onMouseDownHandler(ev) {
+
         // line svg
 
-        if(ev.target.classList.contains('flowchart-operator-connector-arrow')) {
+        if( ev.target.classList.contains('flowchart-operator-connector-arrow') && !ev.path.find((el) => el.classList?.contains('flowchart-operator-inputs')) ) {
             this.#isCreateLink = true;
             const arrowOutput = ev.target.nextElementSibling;
             

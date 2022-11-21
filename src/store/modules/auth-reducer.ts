@@ -1,9 +1,10 @@
 import { authAPI } from "api/auth";
+import LocalStorageService from "~/utils/LocalStorageService";
 import { ActionTypes } from "./action-types";
 import { MutationTypes } from "./mutations-types";
 
 type AuthCredentials = {
-    email: string;
+    username: string;
     password: string;
 }
 export interface AuthState {
@@ -23,15 +24,19 @@ const getters = {
 
 const mutations = {
     [MutationTypes.SET_USER_CREDENTIALS](state, payload){       // rootState 3
-        state.authToken = payload.token
+        state.authToken = payload.auth_token
     }
 }
 
 const actions = {
     async [ActionTypes.LOGIN]( { state, commit }, credentials: AuthCredentials){           // commit('module/mutation')
-
-        const res = await authAPI.login(credentials)
-        res && commit(MutationTypes.SET_USER_CREDENTIALS, res.data.data)
+        const localStorage: typeof LocalStorageService = LocalStorageService.getService();
+        
+        const res = await authAPI.login(credentials);
+        if(res.status === 200) {
+            commit(MutationTypes.SET_USER_CREDENTIALS, res.data)
+            localStorage.setToken(res.data.auth_token)
+        }
     }
 }
 

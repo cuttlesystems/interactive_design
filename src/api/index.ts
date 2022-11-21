@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://leonraize.university/api/v2/'
+const BASE_URL = 'api/'
 
 export default axios.create({
     baseURL: BASE_URL
