@@ -1,11 +1,17 @@
 <template>
 
-    <AppDefaultLayout v-slot="slotProps" v-if="!blankRouteList.includes($route.name)">
+    <component :is="currentLayout" v-slot="slotProps" v-if="!blankRouteList.includes($route.name) && isAuth">
         <router-view
             v-bind="slotProps"
         ></router-view>
-    </AppDefaultLayout>
+    </component>
 
+    <!-- <AppDefaultLayout v-slot="slotProps" v-if="!blankRouteList.includes($route.name)">
+        <router-view
+            v-bind="slotProps"
+        ></router-view>
+    </AppDefaultLayout> -->
+    
     <router-view v-else></router-view>
 
 </template>
@@ -17,10 +23,19 @@
     cards -> svg rect || div
     line  -
     
-*   
+*   Main feat create constructor -> login validation
+
+    failure: date, array, object, oop, pattern
+    private field, static -> caches, fixed-conf, replicated across
+    static {}
+
+    css framework -> layouts -> interface -> api
+    layout
 *   
 */
 </script>
 <style lang="scss">
-    
+    #nprogress {
+        z-index: 999999999999 !important;
+    }
 </style>

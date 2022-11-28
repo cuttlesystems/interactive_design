@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
-import { ChartFlow, TreeGraph, Login } from "src/view";
+import { ChartFlow, TreeGraph, Login, MainPage, ProfilePage } from "src/view";
 import guest from '~/middleware/guest';
 import auth from '~/middleware/auth';
 import { useStore } from "~/store";
@@ -13,10 +13,14 @@ const routes: Array<RouteRecordRaw> = [
     { name: 'login', path: '/login', component: Login, 
         meta: { middleware: [ guest ] } 
     },
-    { name: 'chart', path: '/', component: ChartFlow, 
+    { name: 'main', path: '/', component: MainPage, 
+        meta: { middleware: [ auth ] } 
+    },
+    { name: 'chart', path: '/chart-flow', component: ChartFlow, 
         meta: { middleware: [ auth ] } 
     },
     { name: 'tree', path: '/:treeId(\\d+)', component: TreeGraph },       // sensitive: true
+    { name: 'profile', path: '/profile', component: ProfilePage }
 ]
   
   

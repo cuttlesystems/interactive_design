@@ -6,7 +6,7 @@
         <a href="s">s</a>
     </header>
     <div class="constructor-container">
-        <TheNavbar @getSelectedConstructor="getSelectedConstructor" />
+        <TheSidebar @getSelectedConstructor="getSelectedConstructor" />
         <main class="flowchart-column constructor-container__item">
             <slot :selectedConstructor="selectedConstructor" 
                   :isMoved="isMoved"
@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 
-import { TheNavbar } from '~/components'
+import { TheSidebar } from '~/components'
 import {useMouse} from '@cs/useMouse'
 import { isRef, reactive, ref, watch } from '@vue/runtime-core'
 import { useEventListener } from '~/composables/useEventListener'
@@ -56,9 +56,8 @@ function getSelectedConstructor( selectedItem ){            // mouseup fired bef
 
 
 function mouseDownHandler(ev: MouseEvent & {target: HTMLElement}) {
-    
+
     // if( ev.target!.classList.contains('structure-elements__item') ) {
-        
         selectedConstructor.value = ev.target;
         addEventListener('mousemove', mouseMoveHandler)
     // }

@@ -1,2 +1,3 @@
 export * from './globals'
-export * from './Navbar'
+export * from './sidebars'
+export * from './navbars'
