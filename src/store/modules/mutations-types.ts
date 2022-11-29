@@ -8,5 +8,10 @@ export enum MutationTypes {
 
     //                      APP
     INITIALIZE = 'INITIALIZE',
-    SET_EJECT_AXIOS = 'SET_EJECT_AXIOS'
+    SET_EJECT_AXIOS = 'SET_EJECT_AXIOS',
+    SET_IS_EXPAND_SIDEBAR = 'SET_IS_EXPAND_SIDEBAR',
+    SET_CURRENT_LAYOUT = 'SET_CURRENT_LAYOUT',
+
+    //                      BOTS
+    SET_BOTS_LIST = 'SET_BOTS_LIST'
 }

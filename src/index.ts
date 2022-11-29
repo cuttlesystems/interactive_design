@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-
+import Notifications from '@kyvg/vue3-notification'
 
 import App from './App.vue'
 import store, { key } from './store'
@@ -15,5 +15,6 @@ const app = createApp(App)
 app.mixin(globalSettings)
 app.use(devtools)
 app.use(router)
+app.use(Notifications)
 app.use(store, key )
 app.mount("#app")

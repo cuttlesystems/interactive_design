@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
-import { ChartFlow, TreeGraph, Login, MainPage, ProfilePage } from "src/view";
+import { ChartFlow, TreeGraph, Login, MainPage, ProfilePage, CreateBotPage } from "src/view";
 import guest from '~/middleware/guest';
 import auth from '~/middleware/auth';
 import { useStore } from "~/store";
@@ -14,13 +14,14 @@ const routes: Array<RouteRecordRaw> = [
         meta: { middleware: [ guest ] } 
     },
     { name: 'main', path: '/', component: MainPage, 
-        meta: { middleware: [ auth ] } 
+        meta: { middleware: [ auth ], layout: 'MainLayout' } 
     },
     { name: 'chart', path: '/chart-flow', component: ChartFlow, 
-        meta: { middleware: [ auth ] } 
+        meta: { middleware: [ auth ], layout: 'AppDefaultLayout' } 
     },
-    { name: 'tree', path: '/:treeId(\\d+)', component: TreeGraph },       // sensitive: true
-    { name: 'profile', path: '/profile', component: ProfilePage }
+    { name: 'tree', path: '/:treeId(\\d+)',     component: TreeGraph,       meta: { middleware: [ auth ], layout: 'MainLayout' }},       // sensitive: true
+    { name: 'profile', path: '/profile',        component: ProfilePage,     meta: { middleware: [ auth ], layout: 'MainLayout' }},
+    { name: 'create-bot', path: '/create-bot',  component: CreateBotPage,   meta: { middleware: [ auth ], title: 'Создать Бота', layout: 'EmptyLayout' }},
 ]
   
   

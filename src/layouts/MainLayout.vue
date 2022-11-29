@@ -26,7 +26,7 @@ import { TheMainNavbar } from '~/components'
 </script>
 
 
-<style lang="scss" scoped>
+<style lang="scss">
 
     .header {
         background: #FFFFFF;

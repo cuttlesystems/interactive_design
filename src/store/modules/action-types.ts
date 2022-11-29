@@ -11,5 +11,7 @@ export enum ActionTypes {
     LOGIN = 'LOGIN',
     INITIALIZE_USER      = 'INITIALIZE_USER',
 
-    
+    //                      BOTS
+    GET_BOTS_LIST = 'GET_BOTS_LIST',
+    CREATE_BOT = 'CREATE_BOT'
 }

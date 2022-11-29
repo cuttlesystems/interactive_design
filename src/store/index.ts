@@ -1,8 +1,12 @@
 import { InjectionKey } from 'vue';
 import { createStore, createLogger, Store, useStore as baseUseStore } from 'vuex';
+
 import { ActionTypes } from './modules/action-types';
 import { MutationTypes } from './modules/mutations-types';
+
 import authReducer, { AuthState } from './modules/auth-reducer';
+import botsReducer, { BotsState } from './modules/bots-reducer';
+
 import withOutToken, { withToken } from '~/api';
 import { authAPI } from '~/api/auth';
 
@@ -24,7 +28,9 @@ interface RootState {
 
     };
     authReducer: AuthState;
-    currentBot: {}
+    botsReducer: BotsState;
+    currentBot: {},
+    isExpandSideBar: boolean,
     
 }
 
@@ -39,7 +45,8 @@ export default createStore<RootState>({
         initialized: false,
         ejectInstanseAxios: {},
         currentLayout: 'MainLayout',
-        currentBot: {}
+        currentBot: {},
+        isExpandSideBar: true,
     } as RootState,
 
     getters: {
@@ -59,6 +66,12 @@ export default createStore<RootState>({
         },
         [MutationTypes.SET_CURRENT_BOT](state, bot) {
             state.currentBot = bot
+        },
+        [MutationTypes.SET_IS_EXPAND_SIDEBAR](state, bool) {
+            state.isExpandSideBar = bool
+        },
+        [MutationTypes.SET_CURRENT_LAYOUT](state, layout) {
+            state.currentLayout = layout
         }
     },
 
@@ -81,7 +94,8 @@ export default createStore<RootState>({
     },
 
     modules: {
-        authReducer
+        authReducer,
+        botsReducer
     },
     strict: debug,
     plugins: debug ? [createLogger()] : []

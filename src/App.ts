@@ -6,6 +6,7 @@ import { SvgIcon } from "./components";
 
 import AppDefaultLayout from './layouts/AppDefaultLayout.vue'
 import MainLayout from './layouts/MainLayout.vue'
+import EmptyLayout from './layouts/EmptyLayout.vue'
 
 import withOutToken, { withToken } from "./api";
 import attachInterceptors from "./interceptors/attachInterceptors";
@@ -14,6 +15,7 @@ import { MutationTypes } from "./store/modules/mutations-types";
 import { ActionTypes } from "./store/modules/action-types";
 import { useStore } from "./store";
 import { mapState } from "vuex";
+import { useRoute } from "vue-router";
 
 
 export default defineComponent<AppComponentProps,AppComponentData>({
@@ -21,12 +23,14 @@ export default defineComponent<AppComponentProps,AppComponentData>({
     components: {
         SvgIcon,
         AppDefaultLayout,
-        MainLayout
+        MainLayout,
+        EmptyLayout
     },
 
     setup(){
         const blankRouteList = ref(['login'])
-        const store = useStore()
+        const store = useStore();
+        const route = useRoute()
 
         onBeforeMount(() => {
             store.commit(MutationTypes.SET_EJECT_AXIOS , attachInterceptors([withToken, withOutToken], store) );
@@ -40,7 +44,7 @@ export default defineComponent<AppComponentProps,AppComponentData>({
 
         return {
             isAuth: computed(() => store.getters.getToken),
-            currentLayout: computed(() => store.state.currentLayout),
+            currentLayout:  computed(() => route.meta.layout || store.state.currentLayout),
             blankRouteList,
         }
     },

@@ -14,6 +14,8 @@
     
     <router-view v-else></router-view>
 
+    <notifications group="app" position="top right" />
+
 </template>
 <script src="./App.ts">
 /*

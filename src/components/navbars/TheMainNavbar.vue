@@ -1,8 +1,10 @@
 <template>
     <nav class="main-navbar">
-        <div class="main-navbar__icon">
-            <SvgIcon nameId="burger" />
+        <div class="main-navbar__icon" v-if="!allowedBurgerPages.includes(route.name)">
+            <SvgIcon nameId="burger" @click="burgerHandler" />
         </div>
+        <div v-else></div>
+
         <div class="main-navbar__right">
 
             <div class="modal-options" v-click-outside="botsOutsideClick">
@@ -60,18 +62,13 @@ import { useStore } from '~/store'
 import { SvgIcon } from '~/components'
 import { MutationTypes } from '~/store/modules/mutations-types'
 import { ActionTypes } from '~/store/modules/action-types';
+import { useRoute } from 'vue-router';
+
+import { BotsState } from '~/store/modules/bots-reducer'
 
 const store = useStore();
-const bots = reactive([
-    {
-        name: 'Bot 1',
-        id: 1
-    },
-    {
-        name: 'Bot 2',
-        id: 2
-    }
-])
+const route = useRoute()
+let bots = ref([])
 
 const isShow = reactive({
     user: false,
@@ -81,6 +78,8 @@ const arrowDown = ref()
 const arrowDownUser = ref()
 
 const currentBot = ref()
+
+const allowedBurgerPages = ['create-bot']
 
 
 
@@ -127,21 +126,28 @@ function toggleProfileHandler (ev) {
     isShow.user = !isShow.user
 }
 
+function burgerHandler(ev){
+    store.commit(MutationTypes.SET_IS_EXPAND_SIDEBAR, !store.state.isExpandSideBar)
+}
+
 // Computed
 const currentUser = computed(() => store.state.authReducer.currentUser);
 
 //LifeCycleHooks
 
 onMounted(() => {
+    store.dispatch('botsReducer/' + ActionTypes.GET_BOTS_LIST).then((res) => {
+        bots.value = res
+    })
     
     arrowDown.value = document.querySelector('#down-arrow');
     arrowDownUser.value = document.querySelector('#down-arrow__user');
 
     store.dispatch('authReducer/' + ActionTypes.INITIALIZE_USER);
 
-    if(bots.length){
-        currentBot.value = bots[0]
-        store.commit(MutationTypes.SET_CURRENT_BOT, bots[0]) 
+    if(bots.value.length){
+        currentBot.value = bots.value[0]
+        store.commit(MutationTypes.SET_CURRENT_BOT, bots.value[0]) 
     }
 
 })
@@ -175,6 +181,9 @@ onMounted(() => {
             color: #222B45;
             padding-left: 24px;
             position: relative;
+            & .modal-options__inner{
+                border: none;
+            }
             & ul li:first-child {
                 padding: 0;
                 
@@ -238,7 +247,6 @@ onMounted(() => {
             line-height: 18px;
             position: absolute;
             z-index: 2;
-            width: 160px;
             @include m(user) {
                 left: -70px;
                 top: 32px;
