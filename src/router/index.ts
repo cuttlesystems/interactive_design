@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
-import { ChartFlow, TreeGraph, Login, MainPage, ProfilePage, CreateBotPage } from "src/view";
+import { ChartFlow, TreeGraph, Login, Registration, MainPage, ProfilePage, CreateBotPage } from "src/view";
 import guest from '~/middleware/guest';
 import auth from '~/middleware/auth';
 import { useStore } from "~/store";
@@ -11,6 +11,9 @@ import LocalStorageService from "~/utils/LocalStorageService";
 
 const routes: Array<RouteRecordRaw> = [
     { name: 'login', path: '/login', component: Login, 
+        meta: { middleware: [ guest ] } 
+    },
+    { name: 'registration', path: '/registration', component: Registration, 
         meta: { middleware: [ guest ] } 
     },
     { name: 'main', path: '/', component: MainPage, 

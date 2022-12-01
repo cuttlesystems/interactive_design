@@ -21,6 +21,7 @@
 
                 <input type="submit" class="form__btn" />
             </form>
+            
         </div>
     </div>
 </template>

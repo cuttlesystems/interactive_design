@@ -6,5 +6,8 @@ export const authAPI = {
     },
     getUserInfo(){
         return withToken.get('users/')
+    },
+    registration( registrCred ){
+        return instance.post('users/', registrCred)
     }
 }

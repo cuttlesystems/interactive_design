@@ -10,6 +10,7 @@ export enum ActionTypes {
     //                      AUTH_REDUCER
     LOGIN = 'LOGIN',
     INITIALIZE_USER      = 'INITIALIZE_USER',
+    REGISTRATION = 'REGISTRATION',
 
     //                      BOTS
     GET_BOTS_LIST = 'GET_BOTS_LIST',

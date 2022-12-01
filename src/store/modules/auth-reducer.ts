@@ -77,6 +77,10 @@ const actions = {
         context.commit(MutationTypes.SET_USER_INITIAL_CREDENTIALS, ...res.data)
         
     },
+    async [ActionTypes.REGISTRATION](context, registrCred) {
+        const res = await authAPI.registration(registrCred)
+        return res
+    }
 }
 
 

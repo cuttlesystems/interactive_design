@@ -28,7 +28,7 @@ export default defineComponent<AppComponentProps,AppComponentData>({
     },
 
     setup(){
-        const blankRouteList = ref(['login'])
+        const blankRouteList = ref(['login','registration'])
         const store = useStore();
         const route = useRoute()
 
