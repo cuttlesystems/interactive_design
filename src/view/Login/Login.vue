@@ -18,7 +18,7 @@
                 <div class="form__input--error" v-if="v$.password.$dirty && v$.password.required.$invalid">{{ 'Поле не должно быть пустым' }}</div>
                 <div class="form__input--error" v-if="v$.password.$dirty && v$.password.firstCharacter.$invalid">{{ 'Ошибка валидации' }}</div>
                 <div class="form__input--error" v-if="errors.loginField">{{ errors.loginField }}</div>
-
+                <router-link :to="{ name: 'registration' }">{{__('Регистрация')}}</router-link>
                 <input type="submit" class="form__btn" />
             </form>
             
@@ -47,7 +47,15 @@
         height: 100%;
         top: 0;
         left: 0;
-
+        a {
+            color: inherit;
+            font-weight: 400;
+            font-size: 14px;
+            transition: .2s;
+        }
+        a:hover {
+            color: #3DBCCC;
+        }
         @include e(inner){
             padding: 32px;
             box-shadow: 0px 16px 30px rgba(34, 43, 69, 0.2);
