@@ -19,7 +19,7 @@
                 <!-- <div class="form__input--error" v-if="v$.password.$dirty && v$.password.required.$invalid">{{ 'Поле не должно быть пустым' }}</div>
                 <div class="form__input--error" v-if="v$.password.$dirty && v$.password.firstCharacter.$invalid">{{ 'Ошибка валидации' }}</div>
                 <div class="form__input--error" v-if="errors.loginField">{{ errors.loginField }}</div> -->
-
+                <router-link :to="{ name: 'login' }">{{__('Авторизоваться')}}</router-link>
                 <input type="submit" class="form__btn" />
             </form>
             

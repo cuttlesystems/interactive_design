@@ -1,9 +1,9 @@
 <template>
-    <AppDefaultLayout v-slot="slotProps" v-if="!blankRouteList.includes($route.name)">
+    <!-- <AppDefaultLayout v-slot="slotProps" v-if="!blankRouteList.includes($route.name)">
         <router-view
             v-bind="slotProps"
         ></router-view>
-    </AppDefaultLayout>
+    </AppDefaultLayout> -->
 
     <component :is="currentLayout" v-slot="slotProps" v-if="!blankRouteList.includes($route.name) && isAuth">
         <router-view
