@@ -37,12 +37,12 @@ export type UserInfoType = {
 
 export interface AuthState {
     authToken: string;
-    currentUser: UserInfoType | object;
+    currentUser: UserInfoType | null;
 }
 
 const state = (): AuthState => ({
     authToken: '',
-    currentUser: {},
+    currentUser: null,
 })
 
 const getters = {

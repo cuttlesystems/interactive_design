@@ -27,9 +27,6 @@ module.exports = (env: {[key: string]: boolean}) => {
 
         resolve: {
             extensions: ['.ts','.js','.vue','.json'],
-            alias: {
-                'vue': '@vue/runtime-dom',
-            },
             plugins: [new TsConfigPathPlugin()]
         },
 
@@ -96,7 +93,7 @@ module.exports = (env: {[key: string]: boolean}) => {
             }),
             new HtmlWebpackPlugin({
                 template: path.resolve(__dirname, '..', 'public', 'index.html'),
-                title: "AVIATA",
+                title: "CuttleSystems",
                 filename: "index.html",
             }),
             new MiniCssExtractPlugin({
@@ -142,15 +139,21 @@ module.exports = (env: {[key: string]: boolean}) => {
             runtimeChunk: "single",
             splitChunks: {
                 cacheGroups: {
-                vendor: {
-                    test: /[\\/]node_modules[\\/]/,
-                    name: "vendors",
-                    priority: -10,
-                    chunks: "all",
-                },
+                    vendor: {
+                        test: /[\\/]node_modules[\\/]/,
+                        name: "vendors",
+                        priority: -10,
+                        chunks: "all",
+                    },
                 },
             },
         },
+
+        performance: {
+            hints: false,
+            maxEntrypointSize: 512000,
+            maxAssetSize: 512000
+        }
 
     }
 

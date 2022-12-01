@@ -3,7 +3,7 @@ import LocalStorageService from "~/utils/LocalStorageService";
 import { ActionTypes } from "./action-types";
 import { MutationTypes } from "./mutations-types";
 
-interface SingleBotType {
+export interface SingleBotType {
     id: number | null;
     name: string;
     token: string;

@@ -1,6 +1,6 @@
 <template>
     <nav class="main-navbar">
-        <div class="main-navbar__icon" v-if="!allowedBurgerPages.includes(route.name)">
+        <div class="main-navbar__icon" v-if="!allowedBurgerPages.includes(String(route.name))">
             <SvgIcon nameId="burger" @click="burgerHandler" />
         </div>
         <div v-else></div>
@@ -35,7 +35,7 @@
 
             <div class="main-navbar__user">
                 <div class="modal-options__inner" @click.stop="toggleProfileHandler">
-                    <p>{{currentUser.username}}</p>
+                    <p>{{currentUser?.username}}</p>
                     <SvgIcon nameId="down-arrow" id="down-arrow__user" />
                 </div>
 
@@ -54,9 +54,7 @@
 </template>
 
 <script setup lang="ts">
-
 // cannot assign ref to context Svg nameId 
-
 import { computed, onMounted, reactive, Ref, ref } from 'vue'
 import { useStore } from '~/store'
 import { SvgIcon } from '~/components'
@@ -64,11 +62,11 @@ import { MutationTypes } from '~/store/modules/mutations-types'
 import { ActionTypes } from '~/store/modules/action-types';
 import { useRoute } from 'vue-router';
 
-import { BotsState } from '~/store/modules/bots-reducer'
+import { BotsState, SingleBotType } from '~/store/modules/bots-reducer'
 
 const store = useStore();
 const route = useRoute()
-let bots = ref([])
+let bots: Ref<Array<SingleBotType>> = ref([])
 
 const isShow = reactive({
     user: false,
@@ -79,7 +77,7 @@ const arrowDownUser = ref()
 
 const currentBot = ref()
 
-const allowedBurgerPages = ['create-bot']
+const allowedBurgerPages = ref(['create-bot'])
 
 
 
@@ -90,7 +88,7 @@ function botsToggleHandler (ev) {
     if(ev.target?.classList?.contains('icon__down-arrow')) {
         arrowDown.value = ev.target
     }
-    console.log(arrowDown.value, '123')
+    
     if(!isShow.bots) {
         (arrowDown.value! as SVGElement)?.classList?.add('arrow-rotate')
     }else {
@@ -145,6 +143,7 @@ onMounted(() => {
 
     store.dispatch('authReducer/' + ActionTypes.INITIALIZE_USER);
 
+    
     if(bots.value.length){
         currentBot.value = bots.value[0]
         store.commit(MutationTypes.SET_CURRENT_BOT, bots.value[0]) 

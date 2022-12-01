@@ -3,7 +3,7 @@
         <div class="login__inner">
             <form @submit.prevent="submitHandler" class="form">
                 <h1 class="form__title">Welcome to <br />Cuttle System</h1>
-
+                
                 <input type="text" name="username" class="form__input" placeholder="Введите логин" 
                     v-model="state.username"
                     @blur="v$.username.$touch"
