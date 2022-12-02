@@ -6,6 +6,7 @@ import { MutationTypes } from './modules/mutations-types';
 
 import authReducer, { AuthState } from './modules/auth-reducer';
 import botsReducer, { BotsState } from './modules/bots-reducer';
+import messagesReducer, { MessageState } from './modules/message-reducer';
 
 import withOutToken, { withToken } from '~/api';
 import { authAPI } from '~/api/auth';
@@ -21,16 +22,21 @@ import { authAPI } from '~/api/auth';
     Bind namespace mapState, mapGetters, mapActions, mapMutations   (some/nested/module, [] || {})
 */
 
-interface RootState {
+export interface RootState {
     initialized: boolean;
     currentLayout: string;
     ejectInstanseAxios: {
 
     };
+
+    
+    messagesReducer: MessageState;
     authReducer: AuthState;
     botsReducer: BotsState;
-    currentBot: {},
-    isExpandSideBar: boolean,
+
+
+    currentBot: {};
+    isExpandSideBar: boolean;
     
 }
 
@@ -66,6 +72,7 @@ export default createStore<RootState>({
         },
         [MutationTypes.SET_CURRENT_BOT](state, bot) {
             state.currentBot = bot
+            state.botsReducer.currentBot = bot
         },
         [MutationTypes.SET_IS_EXPAND_SIDEBAR](state, bool) {
             state.isExpandSideBar = bool
@@ -75,7 +82,7 @@ export default createStore<RootState>({
         }
     },
 
-    actions:{
+    actions: {
         [ActionTypes.INITIALIZE_APP](context){
             context.commit(MutationTypes.INITIALIZE)
             
@@ -95,7 +102,8 @@ export default createStore<RootState>({
 
     modules: {
         authReducer,
-        botsReducer
+        botsReducer,
+        messagesReducer
     },
     strict: debug,
     plugins: debug ? [createLogger()] : []

@@ -3,7 +3,7 @@
         <div ref="flowchart" class="flowchart flowchart-container">
             
             <div v-if="constructorList.length" class="flowchart-operators-layer unselectable">
-
+            
                 <div v-for="(item) of constructorList" :key="item.name" class="flowchart-operator operator-trigger op-error"
                     :class="[item.className]" 
                     :style="{
@@ -108,9 +108,17 @@ interface EmitsType {
 }
 
 import { ref, Ref, onMounted, onUnmounted, onUpdated, watch, isReactive, toRefs, computed, reactive, unref, isRef } from 'vue'
+import { useRoute } from 'vue-router';
 
 import { ManageConstructorMap, ManageCardConstructor, chartFlowPosition, ManageLinks } from '~/composables'
 import { constructorPosition } from '~/composables/manageCardConstructor';
+import { useStore } from '~/store';
+import { ActionTypes } from '~/store/modules/action-types';
+
+//  HOOKS
+const store = useStore()
+const route = useRoute()
+//
 
 const props = withDefaults(defineProps<ComponentPropsType>(), {
     selectedConstructor: {},
@@ -247,6 +255,9 @@ onMounted(() => {
     console.log( controlMap.value );
     console.log( controlLink.value, 'link' );
     // controlMap.initialize
+
+    store.dispatch('messagesReducer/' + ActionTypes.GET_MESSAGE_LIST, route.params.id)
+
 })
 
 

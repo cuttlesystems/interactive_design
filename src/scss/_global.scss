@@ -186,3 +186,10 @@ body {
   border: none;
   cursor: pointer;
 }
+
+.green__btn {
+  
+  background: #2eb570;
+
+  @extend .blue__btn
+}

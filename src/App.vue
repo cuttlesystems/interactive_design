@@ -18,6 +18,11 @@
 </template>
 <script src="./App.ts">
 /*
+    TASKS:
+        registraion page validation
+        config nginx all router -> / # leonraize.university
+        
+
 *   RxJS, D3, Typescript
 *   
     links -> svg path

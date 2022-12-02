@@ -22,7 +22,7 @@ export default ( [withToken, withOutToken], store ) => {   // initial req done()
 
     router.afterEach((to, from) => {
 
-        if( [ 'login' ].includes(to.name as string) ){
+        if( [ 'login', 'registration' ].includes(to.name as string) ){
 
             nprogress.done();
 

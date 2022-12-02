@@ -46,7 +46,7 @@
 
 
 <script setup lang="ts">
-import { reactive, unref } from "vue";
+import { onMounted, reactive, unref } from "vue";
 import { Input } from "~/components";
 import { notify } from "@kyvg/vue3-notification";
 import useVuelidate from "@vuelidate/core";
@@ -61,6 +61,11 @@ const formData = reactive({
     token: '',
     description: ''
 })
+
+// onMounted(() => {
+//     store.dispatch('messagesReducer/'+ActionTypes.GET_MESSAGE_LIST, 8)
+// })
+
 
 async function completeFormData() {
     const isValid = await v$.value.$validate();

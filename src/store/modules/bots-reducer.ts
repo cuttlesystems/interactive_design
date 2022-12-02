@@ -30,7 +30,7 @@ const state = (): BotsState => ({
 }) 
 
 const getters = {
-
+    getCurrentBotId: (state,getters) => state.currentBot.id
 }
 
 const mutations = {

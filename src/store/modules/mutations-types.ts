@@ -13,5 +13,9 @@ export enum MutationTypes {
     SET_CURRENT_LAYOUT = 'SET_CURRENT_LAYOUT',
 
     //                      BOTS
-    SET_BOTS_LIST = 'SET_BOTS_LIST'
+    SET_BOTS_LIST = 'SET_BOTS_LIST',
+
+    //                      Messages
+    SET_CURRENT_MESSAGE='SET_CURRENT_MESSAGE',
+    SET_LIST_MESSAGE='SET_LIST_MESSAGE'
 }

@@ -121,11 +121,35 @@ module.exports = (env: {[key: string]: boolean}) => {
                 overlay: true,
             },
             proxy: {
+                '/chart-flow/*': {
+                    target: 'http://127.0.0.1:8000',
+                    pathRewrite: {
+                        '/chart-flow': ''
+                    },
+                    secure: false,
+                    changeOrigin: true,
+                    proxyTimeout: 5 * 60 * 1000,
+                    timeout: 5 * 60 * 1000,
+                },
                 '/api': {
                     // target: `${config.devBackend.protocol}://${
                     //     config.devBackend.host
                     // }:${config.devBackend.port}`,
                     target: 'http://127.0.0.1:8000',
+                    // pathRewrite: {
+                    //     '/api': ''
+                    // },
+                    // bypass: function (req, res, opt) {
+                    //     debugger
+                    //     if (
+                    //         req.path.startsWith(this.context) &&
+                    //         ((req.headers.accept &&
+                    //             req.headers.accept.indexOf('html') !== -1) ||
+                    //             !req.headers.accept)
+                    //     ) {
+                    //         return '/customer/index.html';
+                    //     }
+                    // },
                     secure: false,
                     changeOrigin: true,
                     proxyTimeout: 5 * 60 * 1000,

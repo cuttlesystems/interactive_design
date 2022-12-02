@@ -9,7 +9,6 @@ const BASE_URL = 'api/'
 
 export const withToken = axios.create({
     baseURL: BASE_URL,
-    withCredentials: true
 })
 
 
