@@ -19,7 +19,7 @@ const routes: Array<RouteRecordRaw> = [
     { name: 'main', path: '/', component: MainPage, 
         meta: { middleware: [ auth ], layout: 'MainLayout' } 
     },
-    { name: 'chart', path: '/chart-flow/:id', component: ChartFlow, 
+    { name: 'chart', path: '/chart-flow', component: ChartFlow, 
         meta: { middleware: [ auth ], layout: 'AppDefaultLayout' } 
     },
     { name: 'tree', path: '/:treeId(\\d+)',     component: TreeGraph,       meta: { middleware: [ auth ], layout: 'MainLayout' }},       // sensitive: true

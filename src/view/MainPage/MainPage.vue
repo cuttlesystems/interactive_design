@@ -35,10 +35,9 @@ function structureBotHandler(){
     if(currentBotId.value){
         router.push({
         name: 'chart',
-        params:{    
+        query:{    
             id: currentBotId.value
         },
-        replace: true
     })
     }else {
         notify({

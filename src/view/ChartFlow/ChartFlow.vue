@@ -255,8 +255,7 @@ onMounted(() => {
     console.log( controlMap.value );
     console.log( controlLink.value, 'link' );
     // controlMap.initialize
-
-    store.dispatch('messagesReducer/' + ActionTypes.GET_MESSAGE_LIST, route.params.id)
+    store.dispatch('messagesReducer/' + ActionTypes.GET_MESSAGE_LIST, route.query.id)
 
 })
 
