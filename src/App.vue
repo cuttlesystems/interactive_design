@@ -4,14 +4,21 @@
             v-bind="slotProps"
         ></router-view>
     </AppDefaultLayout> -->
-
-    <component :is="currentLayout" v-slot="slotProps" v-if="!blankRouteList.includes($route.name) && isAuth">
+    <div :style="{
+        'display': 'flex',
+        'height': '100vh',
+        'justify-content': 'center',
+        'align-items': 'center'
+    }">
+        IN PROGRESS!!!
+    </div>
+    <!-- <component :is="currentLayout" v-slot="slotProps" v-if="!blankRouteList.includes($route.name) && isAuth">
         <router-view
             v-bind="slotProps"
         ></router-view>
     </component>
     
-    <router-view v-else></router-view>
+    <router-view v-else></router-view> -->
 
     <notifications group="app" position="top right" />
 

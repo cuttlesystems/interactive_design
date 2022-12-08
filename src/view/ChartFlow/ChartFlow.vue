@@ -243,7 +243,7 @@ watch(() => chartFlowPosition,
 onMounted(() => {
     
     flowChartPosition.value  = flowchart.value!.getBoundingClientRect();
-
+    
     controlMap.value         = new ManageConstructorMap( flowchart.value as HTMLDivElement );
 
     controlConstructor.value = new ManageCardConstructor( constrolLinkLayer.value as SVGElement );
