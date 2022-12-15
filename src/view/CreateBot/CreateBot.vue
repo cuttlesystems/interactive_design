@@ -45,7 +45,7 @@
 
 
 
-<script setup lang="ts">
+<script setup lang="ts">    //      FIX(WHEN GO BACK CURRENT BOT WILL BE RESETED)
 import { onMounted, reactive, unref } from "vue";
 import { Input } from "~/components";
 import { notify } from "@kyvg/vue3-notification";

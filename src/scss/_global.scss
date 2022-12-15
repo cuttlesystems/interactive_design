@@ -193,3 +193,53 @@ body {
 
   @extend .blue__btn
 }
+.red__btn{
+
+  background-color: #bb364d;
+  
+  @extend .blue__btn
+}
+
+.selected{
+  &__gold-border {
+    box-shadow: 0 0 0 1px #e2b141, 0 0 0 4px rgb(226 177 65 / 30%);
+    border-color: #e2b141;
+    
+  }
+  &__green-border {
+    border-color: #31c178;
+    box-shadow: 0 0 0 1px #31c178, 0 0 0 4px rgb(49 193 120 / 30%);
+  }
+}
+
+.green__btn-success {
+  color: #fff;
+  background-color: #31c178;
+  border-color: #31c178;
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: 700;
+  text-align: center;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  padding: 8px 12px;
+  font-size: 15px;
+  line-height: 1.42857143;
+  border-radius: 4px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.block-sidebar {
+  user-select: none;
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: .5;
+}

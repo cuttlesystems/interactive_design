@@ -2,6 +2,7 @@
     <div class="custom-input">
         <p class="custom-input__label">{{__(label)}}</p>
         <input 
+            :disabled="$attrs.disabled"
             :value="value"
             @input="onChangeHandler"
             :placeholder="placeholder"
@@ -26,8 +27,10 @@ export default defineComponent({
         },
         placeholder: String,
         label: String
+        
     },
 
+    inheritAttrs: false,
 
     emits: {
         onChange(value){
@@ -44,7 +47,7 @@ export default defineComponent({
 
     setup(props, context){
 
-        const v$ = useVuelidate()
+        const v$ = useVuelidate();
 
         return {
             v$,

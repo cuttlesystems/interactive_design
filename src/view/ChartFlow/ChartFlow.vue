@@ -1,31 +1,69 @@
 <template>
-    <div class="scrollable-area">
+    <div  class="scrollable-area">
+        <div ref="shadowLayer" class="shadow__layer"></div>
         <div ref="flowchart" class="flowchart flowchart-container">
             
             <div v-if="constructorList.length" class="flowchart-operators-layer unselectable">
             
-                <div v-for="(item) of constructorList" :key="item.name" class="flowchart-operator operator-trigger op-error"
-                    :class="[item.className]" 
+                <div v-for="(item,idx) of constructorList" :key="item.coordinate_x ? (item.coordinate_x + item.coordinate_y) : idx" 
+                    class="flowchart-operator operator-trigger op-message"
+                    :class="[idx % 2 === 1 ? 'selected__gold-border': 'selected__green-border']"
                     :style="{
-                        'top': `${ item.top || mouseMoveYPosition }px`,
-                        'left': `${ item.left || mouseMoveXPosition }px`,
-                        }"
-                    :data-name="item.name"
+                        'left': `${ item.coordinate_x || mouseMoveXPosition }px`,
+                        'top': `${ item.coordinate_y || mouseMoveYPosition }px`,
+                    }"
+                    
+                    @click.stop.prevent="onConstructorSelectHandler($event,item)"
+                    :data-constructorid="item.id"
                 >
+                <!-- :data-uuid="item.uuid" -->
                     <div class="flowchart-operator-inputs">
                         <div class="flowchart-operator-connector-set">
                             <div class="flowchart-operator-connector">
                                 <div class="flowchart-operator-connector-label"></div>
                                 <div class="flowchart-operator-connector-arrow"></div>
-                                <div class="flowchart-operator-connector-small-arrow"></div>
+                                <div :id="`constructor__input-${item.id}`"
+                                    class="flowchart-operator-connector-small-arrow"
+                                    :data-constructorid="item.id"
+                                ></div>
                             </div>
                         </div>
                     </div>
-                    <div class="flowchart-operator-title">{{item.name}}</div>
+
+                    <div class="flowchart-operator-title"> {{ __(item.text || item.tempName) }} </div>
+                    
                     <div class="flowchart-operator-body">
-                        <p>Выберите контент письма</p>
+                        <!-- <p>Выберите контент письма</p> -->
+                        
+                        <div class="element-message">
+                           
+                            <div class="element-message-content">
+                                {{__('Введите текст сообщения')}}
+                            </div>
+
+                            <ul v-if="item.current_variants?.length"
+                                class="element-btn-wrap">
+                                <li v-for="option of item.current_variants"
+                                    :key="option.id"
+                                    class="element-btn element-btn-postback">
+                                    <span>{{option.text}}</span>
+                                    <div class="flowchart-operator-connector-set">
+                                        <div class="flowchart-operator-connector">
+                                            <div class="flowchart-operator-connector-label"></div>
+                                            <div class="flowchart-operator-connector-arrow"></div>
+                                            <div :id="`constructor__output-${option.id}`"
+                                                class="flowchart-operator-connector-small-arrow"
+                                                :data-optionid="option.id"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+
+                        </div>
                     </div>
-                    <div class="flowchart-operator-outputs">
+
+                    <!-- <div class="flowchart-operator-outputs">
                         <div class="flowchart-operator-connector-set">
                             <div class="flowchart-operator-connector">
                                 <div class="flowchart-operator-connector-label"></div>
@@ -33,7 +71,7 @@
                                 <div class="flowchart-operator-connector-small-arrow"></div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 
                 <!-- <div class="flowchart-operator operator-trigger op-error">
@@ -51,9 +89,22 @@
                 </div> -->
                     
             </div>
-
+            <!-- Layer LIST -->
             <svg ref="constrolLinkLayer" class="flowchart-links-layer">
-                
+                <g 
+                    v-for="( option ) of optionListAll"
+                    :key="option.id"
+                >
+                    <mask :id="`fc_mask_${option.id}`">
+                        <!-- <rect x="0" y="0" width="100%" height="100%" stroke="none" fill="white" />
+                        <polygon stroke="none" fill="black" points="${this.#outputArrowPosition.x - this._chartFlowPosition.x - 110 - 10},${this.#outputArrowPosition.y - this._chartFlowPosition.y - 85 - 10} ${this.#outputArrowPosition.x - this._chartFlowPosition.x - 110},${this.#outputArrowPosition.y - this._chartFlowPosition.y - 85} ${this.#outputArrowPosition.x - this._chartFlowPosition.x - 110 - 10},${this.#outputArrowPosition.y - this._chartFlowPosition.y - 85 + 10}"></polygon> -->
+                    </mask>
+                    <g class="flowchart-link" :data-link_id="option.id" :id="`fc_path_${option.id}_g`" >
+                        <path :id="`fc__path-${option.id}`" stroke-width="3" fill="none" :d="option.computePathPosition"
+                        stroke="#3366ff"></path>
+                        <!-- <rect x="${this.#outputArrowPosition.x - this._chartFlowPosition.x - 110 - 10}" y="${this.#outputArrowPosition.y - this._chartFlowPosition.y - 85 - 10}" width="11" height="2" fill="#3366ff" stroke="none" :mask="`fc_mask_${option.id}`" /> -->
+                    </g>
+                </g>
             </svg>
 
             <svg class="flowchart-temporary-link-layer" :style="{display:'none'}">
@@ -61,7 +112,11 @@
             </svg>
 
         </div>
+
     </div>
+
+    <ChartFlowSidebarRight />
+
 </template>
 
 <script lang="ts" setup>
@@ -83,7 +138,7 @@
     x1,y1  curveX1,curveY1 curveX2,curveY2  x2,y2
 
     polygon
-    g
+    group
     mask
 
     define input connector -
@@ -94,6 +149,12 @@
     x1,y1 -> path x1,y1 curveX1,curveY1
     x2,y2 -> path curveX2,curveY2 x2,y2
     
+*/
+
+/*
+    BUTTON(SAVE) -> post bundle of:
+                                    constructor, options, link layers,
+
 */
 
 interface ComponentPropsType {
@@ -107,18 +168,22 @@ interface EmitsType {
     // (e: 'update', value: string): void
 }
 
-import { ref, Ref, onMounted, onUnmounted, onUpdated, watch, isReactive, toRefs, computed, reactive, unref, isRef } from 'vue'
+import { ref, Ref, onMounted, onUnmounted, onUpdated, watch, isReactive, toRefs, computed, reactive, unref, isRef, customRef } from 'vue'
 import { useRoute } from 'vue-router';
+import { useStore } from '~/store';
 
+import { ChartFlowSidebarRight } from '~/components';
 import { ManageConstructorMap, ManageCardConstructor, chartFlowPosition, ManageLinks } from '~/composables'
 import { constructorPosition } from '~/composables/manageCardConstructor';
-import { useStore } from '~/store';
-import { ActionTypes } from '~/store/modules/action-types';
 
-//  HOOKS
-const store = useStore()
-const route = useRoute()
-//
+import { ActionTypes } from '~/store/modules/action-types';
+import { MutationTypes } from '~/store/modules/mutations-types';
+import { INITIAL_VALUE, MessageType } from '~/store/modules/message-reducer';
+
+enum REDUCERS {
+    MESSAGES = 'messagesReducer/'        // 0
+}
+
 
 const props = withDefaults(defineProps<ComponentPropsType>(), {
     selectedConstructor: {},
@@ -129,57 +194,126 @@ const props = withDefaults(defineProps<ComponentPropsType>(), {
     }
 })
 
+//  HOOKS
+const store = useStore();
+const route = useRoute();
+//
+
 const flowchart: Ref<HTMLElement | null> = ref(null);
 const flowChartPosition: Ref<DOMRect  | null> = ref(null);
 const controlMap = ref({});
 const controlConstructor = ref({});
 const controlLink = ref({});
 const constrolLinkLayer = ref({});
+const shadowLayer: Ref<HTMLDivElement | null> = ref(null)
 
+// NODES
+const sideBarRef: Ref<null | HTMLDivElement> = ref(null)
 
-const constructorList: Ref<Array<{
-    name: string,
-    top?: number,
-    left?: number,
-    className?: string
-}>> = ref([]);
+let currentConstructorUUID = ref()
+
+//  GLOBAL LIST
+const constructorList: Ref<Array<MessageType>> = computed({
+    get() {
+        return store.state.messagesReducer.constructorList
+    },
+    set(val){
+        console.log(val, 'VAL')
+        
+        store.commit(REDUCERS.MESSAGES + MutationTypes.ATTACH_COMPUTED_PATH_POSITION, val)
+    }
+} );
+// MUTATE IN VUEX
+const optionListAll = computed( () => constructorList.value.map( ( constructor ) => constructor.current_variants!.map((option) => {
+    //option.computePathPosition = attachComputedPathPosition(option)
+    return option
+})
+).flat(3) );
+
+function attachComputedPathPosition(option): string {
+
+    return ''
+}
 
 // const { mouseMoveXPosition, mouseMoveYPosition } = toRefs(props.mousePosition)
 
+//     ADD CONSTRUCTOR
+
 watch(() => props.isMoved,(moved,prevModev) => {
-    console.log('moved', props.isMoved)
+
     if( props.selectedConstructor.classList.contains( 'structure-elements__item' )){
 
         if(props.isMoved){
-
-            console.log('inside moved')
-            const idxConstructor = constructorList.value.findIndex((el) => el.name === props.selectedConstructor.dataset.name)
-            if( idxConstructor === -1 ){
-                constructorList.value.push({
-                    name: props.selectedConstructor.dataset.name,
-                    className: props.selectedConstructor.dataset.name === 'Email' ? 'op-message' : '',
-                })
-            }else {
-                // exist
-                constructorList.value[ idxConstructor ]['exist'] = true
-            }
             
+            //let uuid = getUUID()
+            //const idxConstructor = constructorList.value.findIndex((el) => el.uuid === uuid)  // DATASET.NAME TYPE OF CONSTRUCTOR
+            //if( idxConstructor === -1 ){
 
-        } else if(!props.isMoved) {
+                store.commit(
+                    REDUCERS.MESSAGES + MutationTypes.EDIT_CONSTRUCTOR_LIST,
+                    {
+                        tempName: INITIAL_VALUE.TEMP_NAME_CONSTRUCTOR,
+                        
+                    }
+                );
 
-            constructorList.value.forEach((constructor) => {
+                // constructorList.value.push({
+                //     uuid,
+                //     name: props.selectedConstructor.dataset.name,
+                //     className: props.selectedConstructor.dataset.name === 'Email' ? 'op-message' : '',
+                // });
 
-                if(props.selectedConstructor.dataset.name === constructor.name){
-                    
-                    constructor.top  = unref(mouseMoveYPosition);
-                    constructor.left = unref(mouseMoveXPosition);
+            //}else {
+                //uuid = getUUID();
+                // constructorList.value.push({
+                //     uuid,
+                //     name: props.selectedConstructor.dataset.name,
+                //     className: props.selectedConstructor.dataset.name === 'Email' ? 'op-message' : '',
+                // })
+            //}
+            
+            // currentConstructorUUID.value = uuid
+
+        } else if(!props.isMoved) {             // SET INITIAL POSITION CONSTRUCTOR
+
+            store.commit(
+                REDUCERS.MESSAGES + MutationTypes.SET_CONSTRUCTOR_COORDINATE,
+                {
+                    tempName: INITIAL_VALUE.TEMP_NAME_CONSTRUCTOR,
+                    coordinate_x: unref(mouseMoveXPosition),
+                    coordinate_y: unref(mouseMoveYPosition)
                 }
-                return constructor
-            })
+            );
+            // SHOW FORM TO ADD MESSAGE
+            toggleSideBarForm()
+            
+            // constructorList.value.forEach((constructor) => {
+
+            //     if(currentConstructorUUID.value === constructor.uuid){
+                    
+            //         constructor.top  = unref(mouseMoveYPosition);
+            //         constructor.left = unref(mouseMoveXPosition);
+                    
+
+            //         store.commit('messagesReducer/' + MutationTypes.SET_NEW_MESSAGE, {
+            //             // uuid: constructor.uuid,
+            //             tempName: INITIAL_VALUE.TEMP_NAME_CONSTRUCTOR,
+            //             coordinate_x: constructor.left,
+            //             coordinate_y: constructor.top
+            //         })
+            //     }
+
+            //     return constructor
+            // })
+
         }
+
     }
-    console.log(constructorList.value, 'last val')
+
+    
 })
+
+//
 
 watch(() => props.selectedConstructor, (selectedConstr,prevSelectedConstr) => {
     console.log('indeside selectedConstr')
@@ -190,6 +324,8 @@ watch(() => props.selectedConstructor, (selectedConstr,prevSelectedConstr) => {
     }
 
 })
+
+//             INITIAL POSITION     
 
 const mouseMoveXPosition = computed(() => {
         if((chartFlowPosition.x + 110) <= props.mousePosition.mouseMoveXPosition && !chartFlowPosition.isClicked){
@@ -204,20 +340,25 @@ const mouseMoveYPosition = computed(() => {
         return 0
 })
 
+//             FROM MANAGE CONSTRUCTOR CARD
+//             CONSTRUCTOR POSITION SAVE
+//             MANAGE CONSTRUCTOR POSITION AND SAVE IN MAP
+// watch(() => constructorPosition,    // FROM MANAGE CONSTRUCTOR
+//     (curVal) => {
+//         constructorList.value.forEach((constr) => {
+//             console.log(constructorPosition.currentConstructor, 'curr')
+//             if(constr.uuid === parseInt(curVal.currentConstructor)){
+//                 constr.top = curVal.y;
+//                 constr.left = curVal.x;
+//             }
+//         })
+//     },
+//     {
+//         deep: true
+//     }
+// )
 
-watch(() => constructorPosition,
-    (curVal) => {
-        constructorList.value.forEach((constr) => {
-            if(constr.name === curVal.currentConstructor){
-                constr.top = curVal.y;
-                constr.left = curVal.x;
-            }
-        })
-    },
-    {
-        deep: true
-    }
-)
+//
 
 watch(() => chartFlowPosition,
     () => {
@@ -225,6 +366,30 @@ watch(() => chartFlowPosition,
     },
     {
         deep: true
+    }
+)
+//  AJAX MANAGE CONSTRUCTOR
+watch(() => constructorList.value.length,
+    (currVal, prevVal) => {
+        
+        if(currVal > prevVal) {
+            console.log(constructorList.value[prevVal], '11111')
+            // store.dispatch('messagesReducer/' + ActionTypes.CREATE_MESSAGE, {
+            //         botID: route.query.id,
+            //         messageCred: {}
+            // })
+
+        }
+
+    },
+    {
+        deep: true
+    }
+)
+//   CHANGE NAME MESSAGE
+watch(() => store.state.messagesReducer.currentMessage,
+    () => {
+        console.log('CURRENT MESSAGE CHANGE')
     }
 )
 
@@ -257,6 +422,7 @@ onMounted(() => {
     // controlMap.initialize
     store.dispatch('messagesReducer/' + ActionTypes.GET_MESSAGE_LIST, route.query.id)
 
+    sideBarRef.value = document.querySelector('.messenger-flowchart-sidebar')
 })
 
 
@@ -276,7 +442,7 @@ onUnmounted(() => {
 
     removeEventListener('mouseup', (controlLink.value as ManageLinks).onMouseDownId);
     removeEventListener('mousedown', (controlLink.value as ManageLinks).onMouseUpHandlerId);
-})
+});
 
 
 
@@ -299,11 +465,44 @@ onUnmounted(() => {
 
 // }
 
+//                  METHODS
+// function getUUID () {
+//     return Math.round(Math.random() * 100)
+// }
+ function getOptions(constructorId) {
+        
+    return store.dispatch(REDUCERS.MESSAGES + ActionTypes.GET_OPTION_LIST, constructorId)
+}
+
+function toggleSideBarForm () {
+    sideBarRef.value?.classList.toggle('opened-sidebar');
+    (shadowLayer.value as HTMLDivElement ).style.display = 'block';
+    store.commit('messagesReducer/' + MutationTypes.IS_BLOCK_SIDEBAR, true);
+}
+
+function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp before click && OPEN SIDEBAR_FORM AND SET CURRENT_MESSAGE
+    ev.currentTarget.classList.add('op-error');
+
+    store.commit(REDUCERS.MESSAGES + MutationTypes.EDIT_CONSTRUCTOR_FORM, true);
+
+    toggleSideBarForm();
+    
+    store.dispatch(REDUCERS.MESSAGES + ActionTypes.FIND_CURRENT_CONSTRUCTOR, selectedConstructor);
+}
 
 </script>
 
 <style lang="scss">
-
+    .shadow__layer{
+        position: absolute;
+        display: none;
+        z-index: 10;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.1);
+    }
     @include b(scrollable-area){
         background: repeating-linear-gradient(45deg,#eee,#eee 10px,#e5e5e5 10px,#e5e5e5 20px);
         padding: 10px;
@@ -326,6 +525,7 @@ onUnmounted(() => {
         opacity: 1;
         overflow: hidden;
 
+        
         transform: matrix(1, 0, 0, 1, 0, 0);
         transform-origin: 50% 50%;
         transition: none 0s ease 0s;
@@ -342,11 +542,11 @@ onUnmounted(() => {
     @include b(flowchart-operator){
         position: absolute;
         z-index: 1;
-        width: 180px;
+        width: 240px;
         padding: 4px;
+        background-color: rgba(255,255,255,.88);
         border: 1px solid #fff;
         box-shadow: 0 2px 6px #00000026;
-        background: #fff;
         pointer-events: initial;
         border-radius: 4px;
         text-align: center;
@@ -356,22 +556,22 @@ onUnmounted(() => {
             pointer-events: none;
         }
         
+        
     }
     @include b(op-error){
-        border-color: #d4696a;
-        box-shadow: 0 0 0 2px #d4696a;
+        border-color: #d4696a !important;
+        box-shadow: 0 0 0 2px #d4696a !important;
     }
     @include b(op-message){
         & .flowchart-operator-title {
-            background: #00A851;
+            color: #00a851;
         }
     }
 
     @include b(flowchart-operator-title){
         padding: 2px 5px;
         font-weight: 700;
-        background: #D35448;
-        color: #fff;
+        background-color: #e5fff2;
         border-radius: 2px;
         cursor: move;
         white-space: nowrap;
@@ -386,7 +586,7 @@ onUnmounted(() => {
             cursor: move;
             min-height: 60px;
             color: #777;
-            padding: 4px 16px;
+            padding: 4px 6px;
             font-size: 15px;
             line-height: 1.3;
             word-break: break-word;
@@ -433,7 +633,7 @@ onUnmounted(() => {
         flex-grow: 1;
     }
     @include b(flowchart-operator-connector){
-        position: relative;
+        position: absolute;
         width: 100%;
         padding-top: 1px;
         padding-bottom: 1px;
@@ -466,6 +666,69 @@ onUnmounted(() => {
         /* test */
         pointer-events: none;
     }
+    .element-message {
+        flex: 0 0 100%;
+        -webkit-box-flex: 0;
+        text-align: left;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        padding: 6px 10px;
+        border-radius: 10px;
+        display: block;
+        margin: 2px 0;
+        color: #333;
+        word-break: break-word;
+        background-color: rgba(0,0,0,.04);
+        font-size: 13px;
+        &-content {
+            word-break: break-word;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            margin-top: 2px;
+            margin-bottom: 2px;
+            color: #999;
+        }
+    }
     
+    .element-btn-wrap{
+        overflow: hidden;
+
+    }
+    .element-btn{
+        pointer-events: auto;
+
+        position: relative;
+        margin: 4px 0;
+        padding-right: 38px;
+        background-color: #fff;
+        border-radius: 10px;
+        background-color: #fbfbfb;
+        height: 30px;
+        width: 100%;
+        line-height: 30px;
+        color: #000;
+        font-weight: 500;
+        text-align: center;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        text-decoration: none;
+        font-size: 13px;
+        margin-bottom: 8px;
+        box-shadow: inset 0 0 0 1px rgb(51 51 51 / 10%);
+        border: 0;
+        & .flowchart-operator-connector {
+            width: 18px;
+            top: 6px;
+            right: 5px;
+        }
+        & .flowchart-operator-connector-label {
+            width: 100%;
+            height: 30px;
+            top: -8px;
+
+        }
+    }
+   
 
 </style>

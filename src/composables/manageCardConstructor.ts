@@ -1,4 +1,7 @@
 import { isRef, reactive, toRef } from "vue";
+import store from "~/store";
+import { ActionTypes } from "~/store/modules/action-types";
+import { MutationTypes } from "~/store/modules/mutations-types";
 import { chartFlowPosition, ConstructorPositionType } from "./manageChartFlow";
 
 type MousePosition = {
@@ -30,8 +33,9 @@ export const constructorPosition = reactive({
     currentConstructor: ''
 })
 
-class ManageCardConstructor implements IManageCardConstructor {
+class ManageCardConstructor implements IManageCardConstructor { // Playing inside class
     #id: null | number;
+    #IS_MOVE: boolean = false;
 
     #countX = 1;
     #countY = 1;
@@ -48,17 +52,28 @@ class ManageCardConstructor implements IManageCardConstructor {
     mouseUpId: (ev) => void;
     mouseMoveId: (ev) => void;
 
-    path: SVGPathElement | null;
-    positionPath: Array<string>
+    pathOutput: SVGPathElement | null;
+    pathInput: SVGPathElement | null;
+    polygon: SVGPolygonElement | null;
+    rect: SVGRect | null;
+    
+    positionPathOutput: Array<string>
+    positionPathInput: Array<string>
     
     // TEST
 
-    computedOutputLinkX: number;
-    computedOutputLinkY: number;
-    computedInputLinkX: number;
-    computedInputLinkY: number;
+    computedOutputLinkXRight: number;
+    computedOutputLinkYRight: number;
+    computedInputLinkXRight: number;
+    computedInputLinkYRight: number;
 
-    dotsPosition: DotsPosition;
+    computedOutputLinkXLeft: number;
+    computedOutputLinkYLeft: number;
+    computedInputLinkXLeft: number;
+    computedInputLinkYLeft: number;
+
+    dotsPositionOutput: DotsPosition;
+    dotsPositionInput: DotsPosition;
 
     constructor(private readonly _constrolLinkLayer: SVGElement) {
 
@@ -76,9 +91,8 @@ class ManageCardConstructor implements IManageCardConstructor {
     }
 
     onMouseDown(ev: MouseEvent) {
-
+        console.log('MOUSE DOWN EVENT')
         if((ev.target as HTMLDivElement).classList.contains('flowchart-operator')){
-
             /*
                 output | input
             */
@@ -89,23 +103,58 @@ class ManageCardConstructor implements IManageCardConstructor {
 
             this.#constructorPosition = this.#selectedConstructor.getBoundingClientRect()
 
+            //          ALSO HAVE OPTIONS LINK
+            //          FIND ALL ATTACHED LINKS FROM OPTIONS(DATA-KEY)  -> OUTPUT   constructorList.options(next_constructor-id)
+            //          FIND ALL CONNECTED OPTIONS TO CURRENT CONSTRUCTOR   -> INPUT
+            //          constructorList renders all constructors(have options -> info next_constructor) with @click -> 
+            //          when select constructor get all options attached to constructor
+            //    
+                  
+            //          GET FROM LINK LAYER APPROPRIATE LINKS
+            //          0--0--0
 
-            this.path = this._constrolLinkLayer.querySelector(`#${this.#selectedConstructor?.dataset.link?.replace(/(--output|--input)/g,'')}`);
-            if(this.path){
-                
-                this.positionPath = this.path!.getAttribute('d')?.split(' ') as Array<string>
-                this.dotsPosition = {
+            this.pathOutput = this._constrolLinkLayer.querySelector(`#${this.#selectedConstructor?.dataset.linkOutput?.replace(/(--output|--input)/g,'')}`);
+            this.pathInput = this._constrolLinkLayer.querySelector(`#${this.#selectedConstructor?.dataset.linkInput?.replace(/(--output|--input)/g,'')}`);
+
+            //  whether have left or right sides
+
+            // this.polygon = this._constrolLinkLayer.querySelector(`#${this.#selectedConstructor?.dataset.link?.replace(/(--output|--input)/g,'')}`);
+            
+            //          o--o--o
+            
+            // RIGHT SIDE
+            if( this.pathOutput || this.pathInput ){
+
+                this.positionPathOutput = (this.pathOutput || this.pathInput)!.getAttribute('d')?.split(' ') as Array<string>
+                this.dotsPositionOutput = {
                     output: {
-                        x: parseFloat(this.positionPath[0].replace(/(^M|\,.*)/,'')),
-                        y: parseFloat(this.positionPath[0].replace(/^M.*\,/,'')),
+                        x: parseFloat(this.positionPathOutput[0].replace(/(^M|\,.*)/,'')),
+                        y: parseFloat(this.positionPathOutput[0].replace(/^M.*\,/,'')),
                     },
                     input: {
-                        x: parseFloat(this.positionPath[3].replace(/\,.+/,'')),
-                        y: parseFloat(this.positionPath[3].replace(/.+\,/,''))
+                        x: parseFloat(this.positionPathOutput[3].replace(/\,.+/,'')),
+                        y: parseFloat(this.positionPathOutput[3].replace(/.+\,/,''))
                     }
+                }
+                    
+                if(this.pathInput && this.pathOutput){
+                    //  LEFT SIDE
+                    this.positionPathInput = this.pathInput!.getAttribute('d')?.split(' ') as Array<string>
+                    this.dotsPositionInput = {
+                        output: {
+                            x: parseFloat(this.positionPathInput[0].replace(/(^M|\,.*)/,'')),
+                            y: parseFloat(this.positionPathInput[0].replace(/^M.*\,/,'')),
+                        },
+                        input: {
+                            x: parseFloat(this.positionPathInput[3].replace(/\,.+/,'')),
+                            y: parseFloat(this.positionPathInput[3].replace(/.+\,/,''))
+                        }
+                    }
+
                 }
 
             }
+            //
 
             addEventListener('mousemove', this.mouseMoveId)
             
@@ -118,7 +167,7 @@ class ManageCardConstructor implements IManageCardConstructor {
         this.computedPositionX = this.#constructorPosition.x + (ev.pageX - this.#startPositionX ) - chartFlowPosition.x - 110
         this.computedPositionY = this.#constructorPosition.y + (ev.pageY - this.#startPositionY ) - chartFlowPosition.y - 85
 
-        
+        this.#IS_MOVE = true;
 
         if(this.#countX == 5 && this.computedPositionX > 0 ){
             
@@ -150,50 +199,77 @@ class ManageCardConstructor implements IManageCardConstructor {
         // MOVE LINK
 
         // fc__path_#idx-- (output | input) -> #idx = 1 -- AUTOINCREMENT
-        if( this.#selectedConstructor?.dataset.link ){
+        
+        // OUTPUT//
+        if( this.pathOutput || this.pathInput ){
+
+            this.computedOutputLinkXRight = this.dotsPositionOutput.output!.x + (ev.pageX - this.#startPositionX )  
+            this.computedOutputLinkYRight = this.dotsPositionOutput.output!.y + (ev.pageY - this.#startPositionY ) 
+
+            this.computedInputLinkXRight = this.dotsPositionOutput.input!.x + (ev.pageX - this.#startPositionX ) 
+            this.computedInputLinkYRight = this.dotsPositionOutput.input!.y + (ev.pageY - this.#startPositionY )
             
-            this.computedOutputLinkX = this.dotsPosition.output!.x + (ev.pageX - this.#startPositionX )  
-            this.computedOutputLinkY = this.dotsPosition.output!.y + (ev.pageY - this.#startPositionY ) 
+            // INPUT
+            if(this.pathInput && this.pathOutput){
+                // this.computedOutputLinkXLeft = this.dotsPositionInput.output!.x + (ev.pageX - this.#startPositionX )  
+                // this.computedOutputLinkYLeft = this.dotsPositionInput.output!.y + (ev.pageY - this.#startPositionY ) 
 
-            this.computedInputLinkX = this.dotsPosition.input!.x + (ev.pageX - this.#startPositionX )  
-            this.computedInputLinkY = this.dotsPosition.input!.y + (ev.pageY - this.#startPositionY ) 
+                this.computedInputLinkXLeft = this.dotsPositionInput.input!.x + (ev.pageX - this.#startPositionX ) 
+                this.computedInputLinkYLeft = this.dotsPositionInput.input!.y + (ev.pageY - this.#startPositionY )
 
-            if(/output/g.test((this.#selectedConstructor?.dataset.link as string))){
+            }
+            
 
-                this.path!.setAttribute('d', `M${this.computedOutputLinkX },${this.computedOutputLinkY } C${this.computedOutputLinkX },${this.computedOutputLinkY + 100 } ${this.dotsPosition.input!.x },${this.dotsPosition.input!.y - 100 } ${this.dotsPosition.input!.x },${this.dotsPosition.input!.y }`)
-     
-            } else if(/input/g.test((this.#selectedConstructor?.dataset.link as string))){
+            if(/output/g.test((this.#selectedConstructor?.dataset.linkOutput as string)) ){
 
-                this.path!.setAttribute('d', `M${this.dotsPosition.output!.x },${this.dotsPosition.output!.y } C${this.dotsPosition.output!.x },${this.dotsPosition.output!.y + 100 } ${this.computedInputLinkX },${this.computedInputLinkY - 100 } ${this.computedInputLinkX },${this.computedInputLinkY }`)
+                this.pathOutput!.setAttribute('d', `M${this.computedOutputLinkXRight },${this.computedOutputLinkYRight } C${this.computedOutputLinkXRight },${this.computedOutputLinkYRight + 100 } ${this.dotsPositionOutput.input!.x },${this.dotsPositionOutput.input!.y - 100 } ${this.dotsPositionOutput.input!.x },${this.dotsPositionOutput.input!.y }`)
+                
+            }//
+
+            if(/input/g.test((this.#selectedConstructor?.dataset.linkInput as string))  ){
+                
+                this.pathInput!.setAttribute('d', `M${this.dotsPositionOutput.output!.x },${this.dotsPositionOutput.output!.y } C${this.dotsPositionOutput.output!.x },${this.dotsPositionOutput.output!.y + 100 } ${this.computedInputLinkXRight },${this.computedInputLinkYRight - 100 } ${this.computedInputLinkXRight },${this.computedInputLinkYRight }`)
+                
+            }
+
+            if( this.pathOutput && this.pathInput ) {
+
+                this.pathOutput!.setAttribute('d', `M${this.computedOutputLinkXRight },${this.computedOutputLinkYRight } C${this.computedOutputLinkXRight },${this.computedOutputLinkYRight + 100 } ${this.dotsPositionOutput.input!.x },${this.dotsPositionOutput.input!.y - 100 } ${this.dotsPositionOutput.input!.x },${this.dotsPositionOutput.input!.y }`)
+
+                this.pathInput!.setAttribute('d', `M${this.dotsPositionInput.output!.x },${this.dotsPositionInput.output!.y } C${this.dotsPositionInput.output!.x },${this.dotsPositionInput.output!.y + 100 } ${this.computedInputLinkXLeft },${this.computedInputLinkYLeft - 100 } ${this.computedInputLinkXLeft },${this.computedInputLinkYLeft }`)
 
             }
         }
-        
-        
+        //  third conditional both
         
     }
 
     onMouseUp(ev : MouseEvent) {
 
+        console.log('MOUSE UP EVENT')
+
         if( this.#selectedConstructor!?.classList.contains('flowchart-operator') ){
-            if(this.computedPositionX > 0 ){
-                constructorPosition.x = this.computedPositionX
+
+            if(this.computedPositionX > 0 && this.computedPositionY > 0 && this.#IS_MOVE){
+                this.#IS_MOVE = false;
+                store.dispatch('messagesReducer/' + ActionTypes.UPDATE_CONSTRUCTOR, {
+                    id: this.#selectedConstructor!.dataset.constructorid,    // TO FIND APPROPRIATE CONSTRUCTOR
+                    coordinate_x: this.computedPositionX,
+                    coordinate_y: this.computedPositionY
+                })
             }
-            if(this.computedPositionY > 0){
-                constructorPosition.y = this.computedPositionY
-            }
-            constructorPosition.currentConstructor = this.#selectedConstructor!.dataset.name as string
+            
         }
+        
+        this.resetState()
+        
+    }
+
+    resetState() {
         
         this.#selectedConstructor = null
 
-        removeEventListener('mousemove', this.mouseMoveId)
-
-        // if(this.#isEventListener){
-        //     console.log('up')
-        //     removeEventListener('mousemove', ManageCardConstructor.onMouseMove)
-        // }
-        
+        this.mouseMoveId && removeEventListener('mousemove', this.mouseMoveId)
     }
 
     // get cardConstructor(){

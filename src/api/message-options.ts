@@ -3,8 +3,8 @@ import { withToken } from "../api"
 
 
 const optionsAPI = {
-    createOption(messageId){
-        return  withToken.post(`messages/${messageId}/variants/`)
+    createOption(messageId, optionCred){
+        return  withToken.post(`messages/${messageId}/variants/`, optionCred)
     },
     getOptions(messageId){
         return withToken.get(`messages/${messageId}/variants/`)
@@ -12,7 +12,7 @@ const optionsAPI = {
     updateMessage(optionId, newOption){
         return withToken.patch(`variant/${optionId}/`, newOption)
     },
-    deleteMessage(optionId){
+    deleteOption(optionId){
         return withToken.delete(`variant/${optionId}/`)
     },
 

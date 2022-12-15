@@ -6,7 +6,7 @@ const messagesAPI = {
         return  withToken.post(`bots/${botId}/messages/`, messageCred)
     },
     getMessages(botId){
-        return withToken.get(`bots/${botId}/messages/`)
+        return withToken.get(`bots/${botId}/messages?with_variants=1`)
     },
     updateMessage(messageId, newMessageWithPosition){
         return withToken.patch(`message/${messageId}/`, newMessageWithPosition)

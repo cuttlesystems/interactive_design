@@ -56,8 +56,8 @@ function getSelectedConstructor( selectedItem ){            // mouseup fired bef
 function mouseDownHandler(ev: MouseEvent & {target: HTMLElement}) {
 
     // if( ev.target!.classList.contains('structure-elements__item') ) {
-        selectedConstructor.value = ev.target;
-        addEventListener('mousemove', mouseMoveHandler)
+    selectedConstructor.value = ev.target;
+    addEventListener('mousemove', mouseMoveHandler)
     // }
     
 }
@@ -78,7 +78,7 @@ function mouseMoveHandler(ev: MouseEvent) {
 function mouseUpHandler(ev: MouseEvent) {
 
     isMoved.value = false;
-    removeEventListener('mousemove', mouseMoveHandler)
+    removeEventListener('mousemove', mouseMoveHandler);
 }
 
 // clean up
