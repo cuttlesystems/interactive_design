@@ -45,16 +45,18 @@ type OptionType = {
 }
 export interface MessageState {
     constructorList: Array<MessageType>;
+    optionListAll: Array<OptionType>;
 
     currentMessage: MessageType | null;
     newMessage: NewMessage | null;
-    optionsListTemp: Array<OptionType>
+    optionsListTemp: Array<OptionType>;
     isBlockSideBar: boolean;
     EDIT_CONSTRUCTOR_FORM: boolean;
 }
 
 const state = (): MessageState => ({
     constructorList: [],
+    optionListAll: [],
 
     currentMessage: null,       // USED WHEN:  EDIT && DELETE && UPDATE -> CLICK
     newMessage: null,           // USED WHEN CREATE -> 
@@ -150,7 +152,8 @@ const mutations = {
 
         state.constructorList.forEach(constructor => {
             if(constructor.id === state.currentMessage.id){
-                constructor.current_variants = [ ...constructor.current_variants, ...state.optionsListTemp]
+                
+                constructor.current_variants = [ ...new Set(constructor.current_variants.concat(state.optionsListTemp))]    // STRANGE BEHAVIOR CONSTRUCTOR.CURRENT_VARIANTS
             }
             return constructor
         })
@@ -178,8 +181,8 @@ const mutations = {
     },
 
     //                      LINK LAYER
-    [MutationTypes.ATTACH_COMPUTED_PATH_POSITION](state, newList){
-        console.log(newList, 'LIST')
+    [MutationTypes.ATTACH_COMPUTED_PATH_POSITION](state){
+        
     }
 
 }
@@ -192,6 +195,9 @@ const actions = {
             
             if(res.status === 200){
                 context.commit(MutationTypes.SET_INITIAL_CONSTRUCTOR_LIST, res.data)
+
+                // context.commit(MutationTypes.ATTACH_COMPUTED_PATH_POSITION)
+
                 return Promise.resolve(res.data)
             }
             return Promise.reject(res)
@@ -206,6 +212,9 @@ const actions = {
         const res = await messagesAPI.createMessage( botID, messageCred );
         
         if(res.status === 201) {
+
+            res.data.hasOwnProperty('current_variants') ? null : res.data.current_variants = [];
+            
             context.commit( MutationTypes.SET_CURRENT_MESSAGE, res.data )       // SETS CURRENT MESSAGE
             context.commit( MutationTypes.SET_CONSTRUCTOR_COORDINATE, {         // SETS NEW MESSAGE
                 tempName: INITIAL_VALUE.TEMP_NAME_CONSTRUCTOR,
@@ -284,7 +293,8 @@ const actions = {
 
 }
 
-function findCurrentMessage(messageId) {
+
+function findCurrentMessage( messageId ) {
 
 }
 

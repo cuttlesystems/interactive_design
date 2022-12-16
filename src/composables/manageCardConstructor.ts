@@ -37,8 +37,6 @@ class ManageCardConstructor implements IManageCardConstructor { // Playing insid
     #id: null | number;
     #IS_MOVE: boolean = false;
 
-    #countX = 1;
-    #countY = 1;
 
     #startPositionX: MouseEvent['pageX'];
     #startPositionY: MouseEvent['pageY'];
@@ -169,31 +167,17 @@ class ManageCardConstructor implements IManageCardConstructor { // Playing insid
 
         this.#IS_MOVE = true;
 
-        if(this.#countX == 5 && this.computedPositionX > 0 ){
+        if( this.computedPositionX > 0 ){
             
             this.#selectedConstructor!.style.left = `${this.computedPositionX}px`
-            this.#countX = 1
 
         }
 
-        if(this.#countY == 5 && this.computedPositionY > 0){
+        if( this.computedPositionY > 0){
 
             this.#selectedConstructor!.style.top = `${this.computedPositionY}px`
-            this.#countY = 1
 
         }
-
-        if(this.#countX > 5){
-            this.#countX = 1
-        }
-        if(this.#countY > 5){
-            this.#countY = 1
-        }
-        
-        this.#countX++
-        this.#countY++
-        // console.log(this.#startPositionX = ev.pageX,
-        //     this.#startPositionY = ev.pageY,)
 
 
         // MOVE LINK
@@ -224,7 +208,7 @@ class ManageCardConstructor implements IManageCardConstructor { // Playing insid
 
                 this.pathOutput!.setAttribute('d', `M${this.computedOutputLinkXRight },${this.computedOutputLinkYRight } C${this.computedOutputLinkXRight },${this.computedOutputLinkYRight + 100 } ${this.dotsPositionOutput.input!.x },${this.dotsPositionOutput.input!.y - 100 } ${this.dotsPositionOutput.input!.x },${this.dotsPositionOutput.input!.y }`)
                 
-            }//
+            }
 
             if(/input/g.test((this.#selectedConstructor?.dataset.linkInput as string))  ){
                 
@@ -288,3 +272,4 @@ class ManageCardConstructor implements IManageCardConstructor { // Playing insid
 }
 
 export default ManageCardConstructor
+

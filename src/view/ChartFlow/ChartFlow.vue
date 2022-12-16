@@ -95,14 +95,18 @@
                     v-for="( option ) of optionListAll"
                     :key="option.id"
                 >
-                    <mask :id="`fc_mask_${option.id}`">
-                        <!-- <rect x="0" y="0" width="100%" height="100%" stroke="none" fill="white" />
-                        <polygon stroke="none" fill="black" points="${this.#outputArrowPosition.x - this._chartFlowPosition.x - 110 - 10},${this.#outputArrowPosition.y - this._chartFlowPosition.y - 85 - 10} ${this.#outputArrowPosition.x - this._chartFlowPosition.x - 110},${this.#outputArrowPosition.y - this._chartFlowPosition.y - 85} ${this.#outputArrowPosition.x - this._chartFlowPosition.x - 110 - 10},${this.#outputArrowPosition.y - this._chartFlowPosition.y - 85 + 10}"></polygon> -->
-                    </mask>
-                    <g class="flowchart-link" :data-link_id="option.id" :id="`fc_path_${option.id}_g`" >
-                        <path :id="`fc__path-${option.id}`" stroke-width="3" fill="none" :d="option.computePathPosition"
-                        stroke="#3366ff"></path>
-                        <!-- <rect x="${this.#outputArrowPosition.x - this._chartFlowPosition.x - 110 - 10}" y="${this.#outputArrowPosition.y - this._chartFlowPosition.y - 85 - 10}" width="11" height="2" fill="#3366ff" stroke="none" :mask="`fc_mask_${option.id}`" /> -->
+                    <g v-if="option.next_message">
+
+                        <mask :id="`fc_mask_${option.id}`">
+                            <rect x="0" y="0" width="100%" height="100%" stroke="none" fill="white" />
+                            <polygon stroke="none" fill="black" :points="computePolygonPosition"></polygon>
+                        </mask>
+                        <g class="flowchart-link" :data-link_id="option.id" :id="`fc_path_${option.id}_g`" >
+                            <path :id="`fc__path-${option.id}`" stroke-width="3" fill="none" :d="option.computePathPosition"
+                            stroke="#3366ff"></path>
+                            <rect :x="option.computeRectPosition.x" :y="option.computeRectPosition.y" width="11" height="2" fill="#3366ff" stroke="none" :mask="`fc_mask_${option.id}`" />
+                        </g>
+
                     </g>
                 </g>
             </svg>
@@ -213,27 +217,10 @@ const sideBarRef: Ref<null | HTMLDivElement> = ref(null)
 let currentConstructorUUID = ref()
 
 //  GLOBAL LIST
-const constructorList: Ref<Array<MessageType>> = computed({
-    get() {
-        return store.state.messagesReducer.constructorList
-    },
-    set(val){
-        console.log(val, 'VAL')
-        
-        store.commit(REDUCERS.MESSAGES + MutationTypes.ATTACH_COMPUTED_PATH_POSITION, val)
-    }
-} );
-// MUTATE IN VUEX
-const optionListAll = computed( () => constructorList.value.map( ( constructor ) => constructor.current_variants!.map((option) => {
-    //option.computePathPosition = attachComputedPathPosition(option)
-    return option
-})
-).flat(3) );
+const constructorList: Ref<Array<MessageType>> = computed( () => store.state.messagesReducer.constructorList );
+const optionListAll = ref( [] );
 
-function attachComputedPathPosition(option): string {
 
-    return ''
-}
 
 // const { mouseMoveXPosition, mouseMoveYPosition } = toRefs(props.mousePosition)
 
@@ -420,11 +407,24 @@ onMounted(() => {
     console.log( controlMap.value );
     console.log( controlLink.value, 'link' );
     // controlMap.initialize
-    store.dispatch('messagesReducer/' + ActionTypes.GET_MESSAGE_LIST, route.query.id)
+    store.dispatch('messagesReducer/' + ActionTypes.GET_MESSAGE_LIST, route.query.id).then((res) => {
+        optionListAll.value = res.map( ( constructor ) => constructor.current_variants!.map((option) => {
 
-    sideBarRef.value = document.querySelector('.messenger-flowchart-sidebar')
-})
+            if( option.next_message ){
+                option.computePathPosition = attachComputedPathPosition(option);
+                option.computePolygonPosition = attachComputedPolygonPosition(option);
+                option.computeRectPosition = attachComputedRectPosition(option);
+            }
 
+            return option
+        })
+        ).flat(3)
+    });
+    alert('WHEN MOVE GET ID CONSTRUCTOR AND FIND ALL INPUTS && OUTPUTS ------- INITIAL CREATE NOT ALLOWED DELETE OPTIONS')
+
+    sideBarRef.value = document.querySelector('.messenger-flowchart-sidebar');
+});
+//  WHEN MOVE GET ID CONSTRUCTOR AND FIND ALL INPUTS && OUTPUTS
 
 
 // onUpdated(() => {
@@ -469,7 +469,39 @@ onUnmounted(() => {
 // function getUUID () {
 //     return Math.round(Math.random() * 100)
 // }
- function getOptions(constructorId) {
+
+/*
+M${this.#outputArrowPosition.x - this._chartFlowPosition.x - 110},${this.#outputArrowPosition.y - this._chartFlowPosition.y - 85} C${this.#outputArrowPosition.x - this._chartFlowPosition.x - 110},${this.#outputArrowPosition.y - this._chartFlowPosition.y + 100 - 85} ${this.#inputArrowPosition.x - this._chartFlowPosition.x - 110},${this.#inputArrowPosition.y - this._chartFlowPosition.y - 100 - 85} ${this.#inputArrowPosition.x - this._chartFlowPosition.x - 110},${this.#inputArrowPosition.y - this._chartFlowPosition.y - 85}
+*/
+
+function attachComputedRectPosition(option){
+
+    const dotOutput = document.getElementById(`constructor__output-${option.id}`)?.getBoundingClientRect() as DOMRect;
+
+    return {
+        x: dotOutput.x - chartFlowPosition.x - 110 - 10,
+        y: dotOutput.y - chartFlowPosition.y - 85 - 10 + 9
+    }
+}
+function attachComputedPolygonPosition (option) {
+
+    const dotOutput = document.getElementById(`constructor__output-${option.id}`)?.getBoundingClientRect() as DOMRect;
+    
+    return `M${dotOutput.x - chartFlowPosition.x - 110 - 10},${dotOutput.y - chartFlowPosition.y - 85 - 10} C${dotOutput.x - chartFlowPosition.x - 110},${dotOutput.y - chartFlowPosition.y - 85 - 10} ${dotOutput.x - chartFlowPosition.x - 110 - 10},${dotOutput.y - chartFlowPosition.y - 85 - 10 + 20}`;
+    
+}
+
+function attachComputedPathPosition(option) {
+
+    const dotOutput = document.getElementById(`constructor__output-${option.id}`)?.getBoundingClientRect() as DOMRect;
+    const dotInput = document.getElementById(`constructor__input-${option.next_message}`)?.getBoundingClientRect() as DOMRect;
+    
+    return `M${dotOutput.x - chartFlowPosition.x - 110},${dotOutput.y - chartFlowPosition.y - 85} C${dotOutput.x - chartFlowPosition.x - 110},${dotOutput.y - chartFlowPosition.y + 100 - 85} ${dotInput.x - chartFlowPosition.x - 110},${dotInput.y - chartFlowPosition.y - 100 - 85} ${dotInput.x - chartFlowPosition.x - 110},${dotInput.y - chartFlowPosition.x - 85}`;
+
+}
+
+
+function getOptions(constructorId) {
         
     return store.dispatch(REDUCERS.MESSAGES + ActionTypes.GET_OPTION_LIST, constructorId)
 }
