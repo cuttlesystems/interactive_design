@@ -6,5 +6,10 @@ export const botAPI = {
     },
     getBots(){
         return withToken.get('bots/')
+    },
+
+    generateBotCode(botId) {
+        
+        return withToken.post(`bots/${botId}/generate/`)
     }
 }

@@ -200,6 +200,13 @@ body {
   @extend .blue__btn
 }
 
+.white__btn {
+  background-color: #fff;
+  color: #00829d;
+
+  @extend .blue__btn
+}
+
 .selected{
   &__gold-border {
     box-shadow: 0 0 0 1px #e2b141, 0 0 0 4px rgb(226 177 65 / 30%);

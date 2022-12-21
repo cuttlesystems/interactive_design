@@ -9,14 +9,14 @@ const optionsAPI = {
     getOptions(messageId){
         return withToken.get(`messages/${messageId}/variants/`)
     },
-    updateMessage(optionId, newOption){
+    updateOption(optionId, newOption){
         return withToken.patch(`variant/${optionId}/`, newOption)
     },
     deleteOption(optionId){
         return withToken.delete(`variant/${optionId}/`)
     },
 
-    getMessageById(optionId){
+    getOptionById(optionId){
         return withToken.get(`variant/${optionId}/`)
     }
 }

@@ -6,14 +6,19 @@
                 {{__('Сообщение')}}
             </h5>
             <div class="sidebar-options-title__field">
-                <Input 
-                    :disabled="notEditMessageName"
-                    :placeholder="__('Введите название сообщений')"
-                    :value="newMessageName"
-                    @onChange="newMessageNameHandler"
-                /> 
+                <div>
+                    <Input 
+                        :disabled="notEditMessageName"
+                        :placeholder="__('Введите название сообщений')"
+                        :value="newMessageName"
+                        @onChange="newMessageNameHandler"
+                    /> 
+                    <span class="edit__title" @click="editHandler">
+                        {{__('Редактировать')}}
+                    </span>
+                </div>
                 <button
-                    :disabled="notEditMessageName"
+                    :disabled="notEditMessageName || !newMessageName"
                     :style="{ opacity: notEditMessageName ? 0.5 : 1 }"
                     class="sidebar-form__append"  
                     @click="setMessageNameHandler">
@@ -36,6 +41,7 @@
                         :placeholder="__('Введите название варианта')"
                         :value="newOptionName"
                         @onChange="optionOnChangeHandler"
+                        :notAllowValidation="notAllowValidation"
                     />
                     <button 
                         :disabled="notAllowedTypeOptions"
@@ -92,7 +98,8 @@ const notEditMessageName = ref(false)
 //NODE
 const flowChartSideBar = ref();
 const optionsForm: Ref< null | HTMLFormElement > = ref(null)
-const shadowLayer: Ref<HTMLDivElement | null> = ref(null)
+const shadowLayer: Ref< HTMLDivElement | null > = ref(null)
+const notAllowValidation = ref(true)
 
 //LIFE CYCLE
 onMounted(() => {
@@ -134,6 +141,7 @@ function addNewOption() {   // Message ID Validate
         store.dispatch('messagesReducer/' + ActionTypes.CREATE_NEW_OPTION, newOptionName.value);    // CURRENT MESSAGE
         
         // newOptionName.value = '';
+        newOptionName.value = '';
         v$.value.$reset();
     }
     
@@ -196,6 +204,12 @@ function afterSetMessageName () {
     // NOT ALLOW CREATE NEW MESSAGE
     notEditMessageName.value = true;
 }
+function toggleEditMessage () {
+    notAllowedTypeOptions.value = true;
+    optionsForm.value!.classList.add('not-allowed');
+    notEditMessageName.value = false;
+
+}
 
 function resetAllState () {
     flowChartSideBar.value.classList.toggle('opened-sidebar');
@@ -219,7 +233,7 @@ function resetAllState () {
 
 async function completeForm(ev) { // COMPLETE FLOW
     const isValid = await v$.value.$validate()
-    if(isValid) {
+    if(isValid || notAllowValidation.value) {
 
         // store.commit('messagesReducer/' + MutationTypes.SET_NEW_MESSAGE, newMessageName.value);
         
@@ -248,6 +262,25 @@ function deleteConstructorHandler() {   // TRACK THAT CURRENT MESSAGE DO NOT MIX
 
 function optionDeleteHandler(option) {
     store.dispatch('messagesReducer/' + ActionTypes.DELETE_OPTION, option)
+        .then((res) => {
+
+            if(res.status === 204) { 
+                
+                const pathEl = document.querySelector(`#fc_path_${option.id}_g`)
+                if( pathEl ) {
+                    pathEl.parentElement?.remove();
+                    
+                }
+                
+            }
+
+        })
+}
+
+function editHandler(ev) {
+    
+    toggleEditMessage();
+
 }
 
 
@@ -258,6 +291,15 @@ function optionDeleteHandler(option) {
      /* SIDEBAR LAYER */
     .sidebar-options-title__field{
         margin-bottom: 25px;
+        position: relative;
+        .edit__title {
+            position: absolute;
+            right: 23px;
+            top: 15px;
+            color: #688fa1;
+            font-size: 13px;
+            cursor: pointer;
+        }
     }
     @include b(messenger-flowchart-sidebar) {
         background: #f5f7f7;

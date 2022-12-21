@@ -7,7 +7,7 @@
             @input="onChangeHandler"
             :placeholder="placeholder"
             type="text" >
-        <span class="custom-input__error form__input--error" v-if="v$.value.$dirty && v$.value.$invalid">
+        <span class="custom-input__error form__input--error" v-if="isDirty">
             {{__('Заполните поле')}}
         </span>
     </div>
@@ -26,7 +26,8 @@ export default defineComponent({
             required: true
         },
         placeholder: String,
-        label: String
+        label: String,
+        notAllowValidation: Boolean,
         
     },
 
@@ -39,12 +40,15 @@ export default defineComponent({
         }
     },
 
-    validations: () => ({
-            value: {
-                required
+    validations(){
+        
+        return {
+                value: {
+                    required
+                }
             }
-        }),
-
+    },
+            
     setup(props, context){
 
         const v$ = useVuelidate();
@@ -60,6 +64,15 @@ export default defineComponent({
             this.v$.value.$touch()
             this.$emit('onChange', value)
 
+        }
+    },
+
+    computed: {
+        isDirty() {
+            if(this.notAllowValidation) {
+                return false
+            }
+            return this.v$.value.$dirty && this.v$.value.$invalid
         }
     }
 })

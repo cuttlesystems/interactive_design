@@ -1,8 +1,7 @@
 <template>
-    <header class="constructor-header">
-      
-     
-    </header>
+
+    <EditorNavbar />
+
     <div class="constructor-container">
         <TheSidebar @getSelectedConstructor="getSelectedConstructor" />
         <main class="flowchart-column constructor-container__item">
@@ -17,11 +16,10 @@
 
 <script setup lang="ts">
 
-import { TheSidebar } from '~/components'
+import { EditorNavbar, TheSidebar } from '~/components'
 import {useMouse} from '@cs/useMouse'
 import { isRef, reactive, ref, watch } from '@vue/runtime-core'
 import { useEventListener } from '~/composables/useEventListener'
-
 
 const selectedConstructor = ref()
 let   isMoved             = ref(false)
@@ -91,13 +89,7 @@ useEventListener({ target: window, event: 'mouseup', cb: mouseUpHandler })
 
 <style lang="scss">
 
-@include b(constructor-header) {
-    box-shadow: 0 4px 10px #00000026;
-    background-color: #0097b7;
-    color: #fff;
-    min-height: 75px;
-    user-select: none;
-}
+
 @include b(constructor-container) {
     position: relative;
     display: table;

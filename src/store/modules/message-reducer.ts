@@ -179,11 +179,29 @@ const mutations = {
         state.optionsListTemp.splice(optionIdx, 1);
 
     },
+    
 
     //                      LINK LAYER
     [MutationTypes.ATTACH_COMPUTED_PATH_POSITION](state){
         
-    }
+    },
+    
+    [MutationTypes.UPDATE_OPTION](state, optionCred) {
+
+        state.constructorList.forEach((constructor) => {
+            if(constructor.id == optionCred.current_message) {
+                constructor.current_variants.forEach((option) => {
+                    if(option.id == optionCred.id) Object.assign(option, optionCred)
+                    return option
+                })
+            }
+            if(constructor.id == optionCred.next_message) {
+                constructor.next_variants.push(optionCred)
+            }
+            return constructor
+        })
+        
+    },
 
 }
 
@@ -208,23 +226,27 @@ const actions = {
     },
 
     async [ActionTypes.CREATE_MESSAGE](context , { botID, messageCred }){
-
-        const res = await messagesAPI.createMessage( botID, messageCred );
-        
-        if(res.status === 201) {
-
-            res.data.hasOwnProperty('current_variants') ? null : res.data.current_variants = [];
+        try {
+            const res = await messagesAPI.createMessage( botID, messageCred );
             
-            context.commit( MutationTypes.SET_CURRENT_MESSAGE, res.data )       // SETS CURRENT MESSAGE
-            context.commit( MutationTypes.SET_CONSTRUCTOR_COORDINATE, {         // SETS NEW MESSAGE
-                tempName: INITIAL_VALUE.TEMP_NAME_CONSTRUCTOR,
-                resetTempName: true,
-                ...res.data
-            })
-            return Promise.resolve(res)
+            if(res.status === 201) {
+    
+                res.data.hasOwnProperty('current_variants') ? null : res.data.current_variants = [];
+                
+                context.commit( MutationTypes.SET_CURRENT_MESSAGE, res.data )       // SETS CURRENT MESSAGE
+                context.commit( MutationTypes.SET_CONSTRUCTOR_COORDINATE, {         // SETS NEW MESSAGE
+                    tempName: INITIAL_VALUE.TEMP_NAME_CONSTRUCTOR,
+                    resetTempName: true,
+                    ...res.data
+                })
+                return Promise.resolve(res)
+            }
+
+        } catch(err) {
+            console.log(err)
+            throw TypeError('New Error')
         }
 
-        throw TypeError('New Error')
     },
 
     async [ActionTypes.UPDATE_CONSTRUCTOR](context, updatedConstructor){    // change state inside && fire mutation in promise
@@ -284,18 +306,47 @@ const actions = {
     async [ActionTypes.DELETE_OPTION](context, option){
         
         const res = await optionsAPI.deleteOption(option.id);
+
         if(res.status === 204) {
+
             context.commit(MutationTypes.DELETE_OPTION, option);
             return Promise.resolve(res)
+
         }
-        return Promise.reject(res)
+
+        return Promise.reject(res);
+    },
+
+    async [ActionTypes.UPDATE_OPTION](context, optionCred) {    // NEED NEXT CONSTRUCTOR ID
+
+        let optionPayload = {
+            next_message: optionCred.constructorId
+        };
+        
+        try {
+
+            const res = await optionsAPI.updateOption(optionCred.optionId, optionPayload);
+            if(res.status === 200) {
+                context.commit(MutationTypes.UPDATE_OPTION, res.data)
+    
+                return res
+
+            }
+
+            return Promise.reject(res)
+
+        } catch(err) {
+            return Promise.reject(err)
+        }
+
+
     }
 
 }
 
 
 function findCurrentMessage( messageId ) {
-
+    
 }
 
 const messagesReducer: Module<MessageState, RootState> = {

@@ -99,12 +99,12 @@
 
                         <mask :id="`fc_mask_${option.id}`">
                             <rect x="0" y="0" width="100%" height="100%" stroke="none" fill="white" />
-                            <polygon stroke="none" fill="black" :points="computePolygonPosition"></polygon>
+                            <polygon stroke="none" fill="black" :points="option.computePolygonPosition"></polygon>
                         </mask>
                         <g class="flowchart-link" :data-link_id="option.id" :id="`fc_path_${option.id}_g`" >
                             <path :id="`fc__path-${option.id}`" stroke-width="3" fill="none" :d="option.computePathPosition"
                             stroke="#3366ff"></path>
-                            <rect :x="option.computeRectPosition.x" :y="option.computeRectPosition.y" width="11" height="2" fill="#3366ff" stroke="none" :mask="`fc_mask_${option.id}`" />
+                            <rect :x="option?.computeRectPosition?.x" :y="option?.computeRectPosition?.y" width="11" height="2" fill="#3366ff" stroke="none" :mask="`fc_mask_${option.id}`" />
                         </g>
 
                     </g>
@@ -124,6 +124,10 @@
 </template>
 
 <script lang="ts" setup>
+/*
+    stright line, delete signle line, delete option along path
+    create bot, start bot, stop bot!
+*/
 /*
 *       1) child can mutate parent's state by object/array nested prop || fire emit in child and let parent perform mutation (cb)
         2) initial state and perform
@@ -398,9 +402,9 @@ onMounted(() => {
     
     controlMap.value         = new ManageConstructorMap( flowchart.value as HTMLDivElement );
 
-    controlConstructor.value = new ManageCardConstructor( constrolLinkLayer.value as SVGElement );
+    controlConstructor.value = new ManageCardConstructor( constrolLinkLayer.value as SVGElement, store, chartFlowPosition );
 
-    controlLink.value        = new ManageLinks( constrolLinkLayer.value as SVGElement, chartFlowPosition );
+    controlLink.value        = new ManageLinks( constrolLinkLayer.value as SVGElement, chartFlowPosition, store );
 
 
     console.log( flowChartPosition.value );
@@ -487,7 +491,7 @@ function attachComputedPolygonPosition (option) {
 
     const dotOutput = document.getElementById(`constructor__output-${option.id}`)?.getBoundingClientRect() as DOMRect;
     
-    return `M${dotOutput.x - chartFlowPosition.x - 110 - 10},${dotOutput.y - chartFlowPosition.y - 85 - 10} C${dotOutput.x - chartFlowPosition.x - 110},${dotOutput.y - chartFlowPosition.y - 85 - 10} ${dotOutput.x - chartFlowPosition.x - 110 - 10},${dotOutput.y - chartFlowPosition.y - 85 - 10 + 20}`;
+    return `${dotOutput.x - chartFlowPosition.x - 110 - 10},${dotOutput.y - chartFlowPosition.y - 85 - 10} ${dotOutput.x - chartFlowPosition.x - 110},${dotOutput.y - chartFlowPosition.y - 85 - 10} ${dotOutput.x - chartFlowPosition.x - 110 - 10},${dotOutput.y - chartFlowPosition.y - 85 - 10 + 20}`;
     
 }
 
@@ -521,6 +525,8 @@ function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp 
     
     store.dispatch(REDUCERS.MESSAGES + ActionTypes.FIND_CURRENT_CONSTRUCTOR, selectedConstructor);
 }
+
+
 
 </script>
 
