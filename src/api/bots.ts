@@ -9,7 +9,12 @@ export const botAPI = {
     },
 
     generateBotCode(botId) {
-        
         return withToken.post(`bots/${botId}/generate/`)
+    },
+    startBot(botId) {
+        return withToken.post(`bots/${botId}/start/`)
+    },
+    stopBot(botId) {
+        return withToken.post(`bots/${botId}/stop/`)
     }
 }

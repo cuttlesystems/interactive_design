@@ -55,8 +55,29 @@ const actions = {
         }
         
     },
+
     [ActionTypes.CREATE_BOT](context ,botCredentials){
         return Promise.resolve(botAPI.createBot(botCredentials))
+    },
+
+    async [ActionTypes.GENERATE_BOT_FILES](context, botId){
+        return await botAPI.generateBotCode(botId)
+    },
+    async [ActionTypes.BOT_TOGGLER](context, config){
+
+        let res;
+
+        switch(config.type) {
+            case 'start':
+                res = await botAPI.startBot(config.botId);break;
+            case 'stop':
+                res = await botAPI.stopBot(config.botId);break;
+            default:
+                return Promise.reject('Try again')
+        }
+        
+        return res
+        
     }
 }
 

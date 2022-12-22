@@ -12,11 +12,11 @@
                     treeId: 1
                 }}">
                     <SvgIcon :nameId="route.name === 'tree' ? 'list--blue' : 'list'" />
-                    <span class="main-sidebar__text">Page 2</span>    
+                    <span class="main-sidebar__text">{{__('Tree')}}</span>    
                 </router-link>
             </li>
             <!-- SET ICON BLUE -->
-            <li class="main-sidebar__item">                 
+            <!-- <li class="main-sidebar__item">                 
                 <router-link :to="{name: 'profile'}">
                     <SvgIcon nameId="wallet" />
                     <span class="main-sidebar__text">Page 3</span>
@@ -33,7 +33,7 @@
                     <SvgIcon nameId="info" />
                     <span class="main-sidebar__text">Page 5</span>
                 </router-link>
-            </li>
+            </li> -->
         </ul>
     </div>
 </template>

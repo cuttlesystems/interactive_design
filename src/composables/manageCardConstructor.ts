@@ -139,9 +139,9 @@ class ManageCardConstructor implements IManageCardConstructor { // Playing insid
             //          0--0--0
 
             // FIND ALL LINKS
-            
+            console.log(this.#selectedConstructor.dataset.constructorid, 'CURRENT ID FROM DOM')
             this.#currentConstructor = store.getters[ 'messagesReducer/' + 'findCurrentMessage'](this.#selectedConstructor.dataset.constructorid);
-            
+            console.log(this.#currentConstructor, 'CURRENT CONSTRUCTOR FROM STORE')
             this.#managePath = new ManagePath( this.#currentConstructor, this._constrolLinkLayer );
 
             // this.pathOutput = this._constrolLinkLayer.querySelector(`#${this.#selectedConstructor?.dataset.linkOutput?.replace(/(--output|--input)/g,'')}`);
@@ -201,17 +201,17 @@ class ManageCardConstructor implements IManageCardConstructor { // Playing insid
 
         this.#IS_MOVE = true;
 
-        if( this.computedPositionX > 0 && this.#selectedConstructor ){
+        if( this.computedPositionX > 0 && this.computedPositionY > 0 && this.#selectedConstructor ){
             
             this.#selectedConstructor!.style.left = `${this.computedPositionX}px`
 
-        }
-
-        if( this.computedPositionY > 0 && this.#selectedConstructor ){
-
             this.#selectedConstructor!.style.top = `${this.computedPositionY}px`
-
         }
+
+        // if(  && this.#selectedConstructor ){
+
+
+        // }
 
 
         // MOVE LINK
@@ -220,12 +220,17 @@ class ManageCardConstructor implements IManageCardConstructor { // Playing insid
         
         // OUTPUT //
         // Array of path -> computedInput
+        
+            
         this.#managePath.inputs.items.forEach((item) => {
             if(item) {
                 const computedPositionX = this.#managePath.inputs.currentConstructorInputPosition.x + (ev.pageX - this.#startPositionX ) - chartFlowPosition.x - 110;
                 const computedPositionY = this.#managePath.inputs.currentConstructorInputPosition.y + (ev.pageY - this.#startPositionY ) - chartFlowPosition.y - 85;
+
+                if(this.computedPositionX > 0 && this.computedPositionY > 0) {
+                    item.pathEl.setAttribute('d', `M${item.staticDotsPosition.x },${item.staticDotsPosition.y } C${ item.staticDotsPosition.x },${item.staticDotsPosition.y + 100 } ${ computedPositionX },${computedPositionY - 100 } ${ computedPositionX },${computedPositionY }`);
+                }
                 
-                item.pathEl.setAttribute('d', `M${item.staticDotsPosition.x },${item.staticDotsPosition.y } C${ item.staticDotsPosition.x },${item.staticDotsPosition.y + 100 } ${ computedPositionX },${computedPositionY - 100 } ${ computedPositionX },${computedPositionY }`);
                 return item
             }
         });
@@ -237,12 +242,18 @@ class ManageCardConstructor implements IManageCardConstructor { // Playing insid
             if(item) {
                 const computedPositionX = item.staticDotsPosition.optionX as number + (ev.pageX - this.#startPositionX );
                 const computedPositionY = item.staticDotsPosition.optionY as number + (ev.pageY - this.#startPositionY );
-    
-                item.pathEl.setAttribute('d', `M${ computedPositionX },${ computedPositionY } C${ computedPositionX },${ computedPositionY + 100 } ${ item.staticDotsPosition.x },${item.staticDotsPosition.y - 100 } ${ item.staticDotsPosition.x },${item.staticDotsPosition.y }`);
+                
+                if(this.computedPositionX > 0 && this.computedPositionY > 0) {
+
+                    item.pathEl.setAttribute('d', `M${ computedPositionX },${ computedPositionY } C${ computedPositionX },${ computedPositionY + 100 } ${ item.staticDotsPosition.x },${item.staticDotsPosition.y - 100 } ${ item.staticDotsPosition.x },${item.staticDotsPosition.y }`);
+
+                }
+                
                 return item
             }
             
         });
+
 
         // if( this.pathOutput || this.pathInput  ){
 

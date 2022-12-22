@@ -187,6 +187,7 @@ import { constructorPosition } from '~/composables/manageCardConstructor';
 import { ActionTypes } from '~/store/modules/action-types';
 import { MutationTypes } from '~/store/modules/mutations-types';
 import { INITIAL_VALUE, MessageType } from '~/store/modules/message-reducer';
+import { ConstructorPositionType } from '~/composables/manageChartFlow';
 
 enum REDUCERS {
     MESSAGES = 'messagesReducer/'        // 0
@@ -424,12 +425,15 @@ onMounted(() => {
         })
         ).flat(3)
     });
-    alert('WHEN MOVE GET ID CONSTRUCTOR AND FIND ALL INPUTS && OUTPUTS ------- INITIAL CREATE NOT ALLOWED DELETE OPTIONS')
-
+    // alert('WHEN MOVE GET ID CONSTRUCTOR AND FIND ALL INPUTS && OUTPUTS ------- INITIAL CREATE NOT ALLOWED DELETE OPTIONS')
+    // alert('WHEN DELETE CONSTRUCTOR REMOVE ALL LINKS && OPTION WHEN ATTACHED TWO CONSTRUCTOR SIDE EFFECT')
+    // alert('GO BACK MAIN AND RETURN TO CONNECT LINK FIX')
+    // alert('DUPLICATED DATA AND DOUBLED REQUEST PATCH LINK')
+    // alert(' MOVE CHARTFLOW AND POLYGON RECT ')
     sideBarRef.value = document.querySelector('.messenger-flowchart-sidebar');
 });
 //  WHEN MOVE GET ID CONSTRUCTOR AND FIND ALL INPUTS && OUTPUTS
-
+    
 
 // onUpdated(() => {
 
@@ -438,6 +442,12 @@ onMounted(() => {
 // }),
 
 onUnmounted(() => {
+    Object.assign(chartFlowPosition, {
+        x: 0,
+        y: 0,
+        isClicked: false
+    }) as ConstructorPositionType
+
     (controlMap.value as ManageConstructorMap).moveBlockEl.removeEventListener('mousedown',(controlMap.value as ManageConstructorMap).onMouseDownId );
     removeEventListener('mouseup',( controlMap.value as ManageConstructorMap).onMouseUpId );
 

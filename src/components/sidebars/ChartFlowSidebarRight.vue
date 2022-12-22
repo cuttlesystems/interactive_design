@@ -146,7 +146,7 @@ function addNewOption() {   // Message ID Validate
     }
     
 }
-function setMessageNameHandler() {
+function setMessageNameHandler() {          // NOT HANDLED EFFECT WHEN CREATED IT DOUBLED
 
     if(!notEditMessageName.value){
 
@@ -247,6 +247,15 @@ function deleteConstructorHandler() {   // TRACK THAT CURRENT MESSAGE DO NOT MIX
     store.dispatch( 'messagesReducer/' + ActionTypes.DELETE_CONSTRUCTOR, currentMessage.value.id)
         .then((res) => {
 
+            const unifiedLinks = currentMessage.value.current_variants.concat(currentMessage.value.next_variants);
+
+            unifiedLinks.forEach( ( link ) => {
+
+                deleteLink(link)
+
+                return link
+            })
+
             resetAllState();
 
         }).catch(() => {
@@ -266,11 +275,7 @@ function optionDeleteHandler(option) {
 
             if(res.status === 204) { 
                 
-                const pathEl = document.querySelector(`#fc_path_${option.id}_g`)
-                if( pathEl ) {
-                    pathEl.parentElement?.remove();
-                    
-                }
+                deleteLink(option)
                 
             }
 
@@ -281,6 +286,15 @@ function editHandler(ev) {
     
     toggleEditMessage();
 
+}
+
+function deleteLink(option) {
+
+    const pathEl = document.querySelector(`#fc_path_${option.id}_g`)
+    if( pathEl ) {
+        pathEl.parentElement?.remove();
+        
+    }
 }
 
 

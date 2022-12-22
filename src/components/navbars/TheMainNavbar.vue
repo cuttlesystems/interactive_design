@@ -45,7 +45,7 @@
                             {{__('Личный кабинет')}}
                         </router-link>
                     </li>
-                    <li class="modal-options__item" >{{__('Выйти')}}</li>
+                    <li class="modal-options__item" @click="quitHandler" >{{__('Выйти')}}</li>
                 </ul>
             </div>
 
@@ -60,12 +60,14 @@ import { useStore } from '~/store'
 import { SvgIcon } from '~/components'
 import { MutationTypes } from '~/store/modules/mutations-types'
 import { ActionTypes } from '~/store/modules/action-types';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 import { BotsState, SingleBotType } from '~/store/modules/bots-reducer'
+import LocalStorageService from '~/utils/LocalStorageService';
 
 const store = useStore();
-const route = useRoute()
+const route = useRoute();
+const router = useRouter();
 let bots: Ref<Array<SingleBotType>> = ref([])
 
 const isShow = reactive({
@@ -78,7 +80,7 @@ const arrowDownUser = ref()
 const currentBot = ref()
 
 const allowedBurgerPages = ref(['create-bot'])
-
+const storage = LocalStorageService.getService();
 
 
 // methods
@@ -128,6 +130,14 @@ function burgerHandler(ev){
     store.commit(MutationTypes.SET_IS_EXPAND_SIDEBAR, !store.state.isExpandSideBar)
 }
 
+function quitHandler(ev) {
+
+    storage.reset();
+    store.commit('authReducer/' + MutationTypes.SET_USER_CREDENTIALS, '');
+    router.push({name: 'login'});
+
+}
+
 // Computed
 const currentUser = computed(() => store.state.authReducer.currentUser);
 
@@ -135,7 +145,23 @@ const currentUser = computed(() => store.state.authReducer.currentUser);
 
 onMounted(() => {
     store.dispatch('botsReducer/' + ActionTypes.GET_BOTS_LIST).then((res) => {
-        bots.value = res
+        bots.value = res;
+
+        if(bots.value.length){
+
+            if( (store.state.currentBot as SingleBotType).id ) {
+                
+                currentBot.value = store.state.currentBot
+
+            } else {
+
+                currentBot.value = bots.value[0];
+
+                store.commit( MutationTypes.SET_CURRENT_BOT, bots.value[0] );
+
+            }
+
+        }
     })
     
     arrowDown.value = document.querySelector('#down-arrow');
@@ -144,10 +170,7 @@ onMounted(() => {
     store.dispatch('authReducer/' + ActionTypes.INITIALIZE_USER);
 
     
-    if(bots.value.length){
-        currentBot.value = bots.value[0]
-        store.commit(MutationTypes.SET_CURRENT_BOT, bots.value[0]) 
-    }
+    
 
 })
 

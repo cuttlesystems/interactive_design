@@ -20,13 +20,42 @@
 </template>
 
 <script setup lang="ts">
+import { notify } from '@kyvg/vue3-notification';
 import { useRoute, useRouter } from 'vue-router';
+import { useStore } from '~/store';
+import { ActionTypes } from '~/store/modules/action-types';
+import { MutationTypes } from '~/store/modules/mutations-types';
 
 const route = useRoute();
-const router = useRouter()
+const router = useRouter();
+const store = useStore();
 
 function saveTemplateHandler(ev) {  // RESET ALL STATES CONSTRUCTOR
 
+    store.commit('messagesReducer/' + MutationTypes.RESET_STATE);
+    store.dispatch('botsReducer/' + ActionTypes.GENERATE_BOT_FILES, route.query.id).then((res) => {
+
+        if(res?.status === 200){
+
+            return notify({
+                group: 'app',
+                type: 'success',
+                text: 'Бот успешно сгенерирован'
+            });
+
+        }
+
+        return Promise.reject(res)
+
+    }).catch(() => {
+
+        notify({
+            group: 'app',
+            type: 'error',
+            title: 'Ошибка',
+        })
+
+    })
     
     router.go(-1);
 }

@@ -54,6 +54,22 @@ export interface MessageState {
     EDIT_CONSTRUCTOR_FORM: boolean;
 }
 
+function getDefaultState () {
+    
+    return {
+        constructorList: [],
+        optionListAll: [],
+
+        currentMessage: null,       // USED WHEN:  EDIT && DELETE && UPDATE -> CLICK
+        newMessage: null,           // USED WHEN CREATE -> 
+
+        optionsListTemp: [],
+        
+        isBlockSideBar: false,
+        EDIT_CONSTRUCTOR_FORM: false,
+    }
+}
+
 const state = (): MessageState => ({
     constructorList: [],
     optionListAll: [],
@@ -195,13 +211,45 @@ const mutations = {
                     return option
                 })
             }
-            if(constructor.id == optionCred.next_message) {
+            if(constructor.id == optionCred.next_message) {     // Error handled by ? try to fix different way
                 constructor.next_variants.push(optionCred)
             }
             return constructor
         })
         
     },
+
+    [MutationTypes.CHANGE_CURRENT_LINK](state, optionCred){     // CHECK DUPILICATED NEXT VARIANTS WHEN RECREATED
+        
+        state.constructorList.forEach((constructor) => {
+
+            if( constructor.id != optionCred.current_message && constructor.id != optionCred.next_message ){
+                
+                const foundIdxOption = constructor.next_variants.findIndex((option) => option.id == optionCred.id)
+                if(foundIdxOption !== -1) {
+                    constructor.next_variants.splice(foundIdxOption, 1)
+                }
+
+            }
+
+            return constructor
+        })
+        
+        const pathEl = document.querySelector(`#fc_path_${optionCred.id}_g`)
+        if( pathEl ) {
+            pathEl.parentElement?.remove();
+            
+        }
+
+
+    },
+
+    // RESET
+    [MutationTypes.RESET_STATE](state){
+
+        Object.assign(state, getDefaultState());
+        
+    }
 
 }
 
@@ -232,6 +280,7 @@ const actions = {
             if(res.status === 201) {
     
                 res.data.hasOwnProperty('current_variants') ? null : res.data.current_variants = [];
+                res.data.hasOwnProperty('next_variants') ? null : res.data.next_variants = [];
                 
                 context.commit( MutationTypes.SET_CURRENT_MESSAGE, res.data )       // SETS CURRENT MESSAGE
                 context.commit( MutationTypes.SET_CONSTRUCTOR_COORDINATE, {         // SETS NEW MESSAGE
@@ -317,7 +366,8 @@ const actions = {
         return Promise.reject(res);
     },
 
-    async [ActionTypes.UPDATE_OPTION](context, optionCred) {    // NEED NEXT CONSTRUCTOR ID
+    async [ActionTypes.UPDATE_OPTION](context, optionCred) {        // CREATE LINK
+                                                                    // NEED NEXT CONSTRUCTOR ID
 
         let optionPayload = {
             next_message: optionCred.constructorId
@@ -325,15 +375,15 @@ const actions = {
         
         try {
 
-            const res = await optionsAPI.updateOption(optionCred.optionId, optionPayload);
+            const res = await optionsAPI.updateOption(optionCred.optionId, optionPayload);      // CHECK optionCred.optionId SOMETIMES UNDEFINED
             if(res.status === 200) {
-                context.commit(MutationTypes.UPDATE_OPTION, res.data)
-    
+                context.commit(MutationTypes.UPDATE_OPTION, res.data);      // PUSH THROW ERROR
+                
                 return res
 
             }
 
-            return Promise.reject(res)
+            return Promise.resolve(res)
 
         } catch(err) {
             return Promise.reject(err)

@@ -1,6 +1,7 @@
 import { notify } from "@kyvg/vue3-notification";
 import { reactive } from "vue";
 import { ActionTypes } from "~/store/modules/action-types";
+import { MutationTypes } from "~/store/modules/mutations-types";
 import { ConstructorPositionType } from "./manageChartFlow";
 
 interface IManageLinks {
@@ -103,7 +104,9 @@ class ManageLinks implements IManageLinks{
             } ).then((res) => {
                 
                 if(res.status === 200) {
-                    
+
+                    this.store.commit('messagesReducer/' + MutationTypes.CHANGE_CURRENT_LINK, res.data);    // remove prev link
+
                     this.#isCreateLink = false;
                     
                     this.#inputArrowPosition = arrowInput.getBoundingClientRect();
@@ -122,14 +125,18 @@ class ManageLinks implements IManageLinks{
                     `;
                     
                     this._svgBlock.insertAdjacentHTML('afterbegin', path);
+                    
+                    
 
                 }
                 
                 
 
             }).catch((err) => {
-                
-                if(err.response.status === 400) {
+
+                console.log(err,'PUSH THROW ERROR FROM UPDATE MUTATION NEXT VARIANTS');
+
+                if(err?.response?.status === 400) {     // IT CAN BE ERROR TYPE WITHOUT PROPERTY
                     return notify({
                         group: 'app',
                         type: 'error',
