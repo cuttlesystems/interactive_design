@@ -7,6 +7,9 @@ export const botAPI = {
     getBots(){
         return withToken.get('bots/')
     },
+    updateBot(botId, botCred){
+        return withToken.patch(`bots/${botId}/`, botCred)
+    },
 
     generateBotCode(botId) {
         return withToken.post(`bots/${botId}/generate/`)

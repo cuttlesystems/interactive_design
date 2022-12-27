@@ -17,6 +17,7 @@ export enum ActionTypes {
     CREATE_BOT = 'CREATE_BOT',
     GENERATE_BOT_FILES='GENERATE_BOT_FILES',
     BOT_TOGGLER='BOT_TOGGLER',
+    UPDATE_BOT='UPDATE_BOT',
 
     //                      MESSAGES
     GET_MESSAGE_LIST='GET_MESSAGE_LIST',

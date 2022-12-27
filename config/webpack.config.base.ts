@@ -40,6 +40,7 @@ module.exports = (env: {[key: string]: boolean}) => {
                             loader: 'ts-loader',
                             options: {
                                 appendTsSuffixTo: [/\.vue$/],
+                                transpileOnly: true
                             },
                         }
                     ]

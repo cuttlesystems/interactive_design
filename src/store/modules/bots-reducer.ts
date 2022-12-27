@@ -34,9 +34,15 @@ const getters = {
 }
 
 const mutations = {
+
     [MutationTypes.SET_BOTS_LIST](state, list){
         state.bots = list
-    }
+    },
+
+    [MutationTypes.SET_BOT_START_MESSAGE](state, start_message){
+        state.currentBot.start_message = start_message;
+    },
+
 }
 
 const actions = {
@@ -78,6 +84,24 @@ const actions = {
         
         return res
         
+    },
+
+    async [ActionTypes.UPDATE_BOT]( { getters, rootState, commit } , setNullNextMessage: boolean) {
+
+        try {
+
+            const res = await botAPI.updateBot( getters['getCurrentBotId'] , {
+                start_message: setNullNextMessage ? null : rootState.messagesReducer.currentMessage.id
+            } );
+
+            commit(MutationTypes.SET_BOT_START_MESSAGE, res.data.start_message);
+            
+            return res
+
+        } catch(err) {
+            throw err;
+        }
+
     }
 }
 
@@ -88,4 +112,5 @@ const botsReducer = {
     mutations,
     actions,
 }
+
 export default botsReducer

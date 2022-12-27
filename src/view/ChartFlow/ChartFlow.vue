@@ -193,7 +193,6 @@ enum REDUCERS {
     MESSAGES = 'messagesReducer/'        // 0
 }
 
-
 const props = withDefaults(defineProps<ComponentPropsType>(), {
     selectedConstructor: {},
     isMoved: false,
@@ -430,6 +429,9 @@ onMounted(() => {
     // alert('GO BACK MAIN AND RETURN TO CONNECT LINK FIX')
     // alert('DUPLICATED DATA AND DOUBLED REQUEST PATCH LINK')
     // alert(' MOVE CHARTFLOW AND POLYGON RECT ')
+    alert('DUPLICATED DATA STORE WHEN MAKE LINK && SOMETIMES UNDEFINED ID LINK');
+    alert('SELECT RADIOA && START MESSAGE && EVENT EMITTER && DATA PROVIDER && STREAM');
+
     sideBarRef.value = document.querySelector('.messenger-flowchart-sidebar');
 });
 //  WHEN MOVE GET ID CONSTRUCTOR AND FIND ALL INPUTS && OUTPUTS

@@ -54,6 +54,20 @@
 
             </form>
 
+            <div class="first-message">
+
+                <span>{{__('Стартовый сообщение')}}: </span>
+
+                <label class="is__first-message">
+
+                    <input type="checkbox" @change="setAsFirstMessage" :checked="isFirstMesssage" />
+
+                    <SvgIcon nameId="checkmark"></SvgIcon>
+
+                </label>
+
+            </div>
+
         </div>
         <div class="sidebar-options-foot">
             <button class="green__btn-success" @click.prevent="completeForm">
@@ -77,6 +91,12 @@ import { Input } from "../inputs";
 import { notify } from "@kyvg/vue3-notification";
 import { SvgIcon } from "../globals";
 
+/*
+    keyboard_type -> RKB, IKB -> checkbox
+    start_message -> messageId
+    
+*/
+
 // HOOKS
 const store = useStore()
 const v$ = useVuelidate()
@@ -91,6 +111,7 @@ const optionsListTemp = computed(() => store.state.messagesReducer.optionsListTe
 const newMessage = computed(() => store.state.messagesReducer.newMessage)                   // TEMP CONSTRUCTOR
 
 const currentMessage = computed(() => store.getters[`messagesReducer/getCurrentMessage`])   // AFTER FETCH
+const isFirstMesssage = computed(() => store.state.botsReducer.currentBot.start_message == currentMessage.value?.id)
 
 const notAllowedTypeOptions = ref(true);
 const notEditMessageName = ref(false)
@@ -138,7 +159,13 @@ function optionOnChangeHandler(val) {
 function addNewOption() {   // Message ID Validate
 
     if(newOptionName.value){    // OPTION MESSAGE
-        store.dispatch('messagesReducer/' + ActionTypes.CREATE_NEW_OPTION, newOptionName.value);    // CURRENT MESSAGE
+        store.dispatch('messagesReducer/' + ActionTypes.CREATE_NEW_OPTION, newOptionName.value).catch((err) => {
+            notify({
+                group: 'app',
+                type: 'error',
+                title: 'Ошибка',
+            })
+        })
         
         // newOptionName.value = '';
         newOptionName.value = '';
@@ -296,6 +323,30 @@ function deleteLink(option) {
         
     }
 }
+// MAKE FIRST MESSAGE
+function setAsFirstMessage(ev) {
+
+    if( ev.currentTarget.checked ) {
+
+        store.dispatch( 'botsReducer/' + ActionTypes.UPDATE_BOT).catch(err => {
+            notify({
+                group: 'app',
+                type: 'error',
+                title: 'Ошибка',
+            })
+        })
+
+    } else {
+        store.dispatch( 'botsReducer/' + ActionTypes.UPDATE_BOT, true).catch(err => {
+            notify({
+                group: 'app',
+                type: 'error',
+                title: 'Ошибка',
+            })
+        })
+    }
+
+}
 
 
 </script>
@@ -429,4 +480,69 @@ function deleteLink(option) {
             }
         }
     }
+
+    .first-message{
+        margin-top: 25px;
+        display: flex;
+        justify-content: end;
+        padding-right: 25px;
+
+        span {
+            font-family: 'Open Sans';
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 20px;
+            color: #8F9BB3;
+            margin-right: 15px;
+        }
+
+        .is__first-message {
+            font-size: 22px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            position: relative;
+            
+            
+            &::after{
+                content: '';
+                display: block;
+                border-radius: 4px;
+                width: 20px;
+                height: 20px;
+                background: #fff;
+                cursor: pointer;
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+            input {
+                position: absolute;
+                display: block;
+                opacity: 0;
+                cursor: pointer;
+                height: 0;
+                width: 0;
+            }
+            .icon__checkmark {
+                background: #3DBCCC;
+                border-radius: 4px;
+                width: 20px;
+                height: 20px;
+                cursor: pointer;
+                position: absolute;
+                left: 0;
+                right: 0;
+                z-index: 22;
+    
+                display: none;
+            }
+            & input:checked ~ .icon__checkmark {
+                display: block;
+            }
+        }
+
+    }
+
 </style>

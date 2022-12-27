@@ -23,7 +23,9 @@ export interface MessageType {
     uuid?: number;
 
     current_variants?: Array<OptionType>;
-    next_variants?: Array<OptionType>; 
+    next_variants?: Array<OptionType>;
+    
+    tempName?: string;
 }
 export enum INITIAL_VALUE {
     TEMP_NAME_CONSTRUCTOR = 'Введите название'
