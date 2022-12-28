@@ -7,12 +7,13 @@
             
                 <div v-for="(item,idx) of constructorList" :key="item.coordinate_x ? (item.coordinate_x + item.coordinate_y) : idx" 
                     class="flowchart-operator operator-trigger op-message"
-                    :class="[idx % 2 === 1 ? 'selected__gold-border': 'selected__green-border']"
+                    :class="[ item.id == currentBot.start_message
+                        ? 'selected__blue-border'
+                        : idx % 2 === 1 ? 'selected__gold-border': 'selected__green-border']"
                     :style="{
                         'left': `${ item.coordinate_x || mouseMoveXPosition }px`,
                         'top': `${ item.coordinate_y || mouseMoveYPosition }px`,
                     }"
-                    
                     @click.stop.prevent="onConstructorSelectHandler($event,item)"
                     :data-constructorid="item.id"
                 >
@@ -224,6 +225,8 @@ let currentConstructorUUID = ref()
 const constructorList: Ref<Array<MessageType>> = computed( () => store.state.messagesReducer.constructorList );
 const optionListAll = ref( [] );
 
+const currentBot = computed( () => store.state.botsReducer.currentBot );
+
 
 
 // const { mouseMoveXPosition, mouseMoveYPosition } = toRefs(props.mousePosition)
@@ -430,8 +433,8 @@ onMounted(() => {
     // alert('DUPLICATED DATA AND DOUBLED REQUEST PATCH LINK')
     // alert(' MOVE CHARTFLOW AND POLYGON RECT ')
     alert('DUPLICATED DATA STORE WHEN MAKE LINK && SOMETIMES UNDEFINED ID LINK');
-    alert('SELECT RADIOA && START MESSAGE && EVENT EMITTER && DATA PROVIDER && STREAM');
-
+    alert('SELECT RADIO && START MESSAGE && EVENT EMITTER && DATA PROVIDER && STREAM');
+    alert('ALLOW TO DELETE MESSAGE && MUST HAVE TO SET NAME OF MESSAGE && PHOTO && VIDEO && FILE && POLYGON && RECT')
     sideBarRef.value = document.querySelector('.messenger-flowchart-sidebar');
 });
 //  WHEN MOVE GET ID CONSTRUCTOR AND FIND ALL INPUTS && OUTPUTS

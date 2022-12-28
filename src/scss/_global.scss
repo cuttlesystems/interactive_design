@@ -217,6 +217,10 @@ body {
     border-color: #31c178;
     box-shadow: 0 0 0 1px #31c178, 0 0 0 4px rgb(49 193 120 / 30%);
   }
+  &__blue-border {
+    border-color: #3c2eff;
+    box-shadow: 0 0 0 2px #3c2eff, 0 0 0 8px rgb(49 193 120 / 30%);
+  }
 }
 
 .green__btn-success {

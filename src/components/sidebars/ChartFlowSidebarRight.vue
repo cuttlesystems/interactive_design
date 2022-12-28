@@ -68,9 +68,27 @@
 
             </div>
 
+            <div class="keyboard-type">
+                    <span class="keyboard-type__title">{{__('Тип клавиатуры')}}:</span>
+                    
+                    <label class="keyboard-type__item"  v-for="keyboard of keyboards" :key="keyboard.id">
+
+                        <span>{{keyboard.name}}</span>
+
+                        <input type="radio" name="keyboard-type__group" :value="keyboard.name" v-model="keyboardComputed" />
+
+                        <SvgIcon nameId="radio-btn"></SvgIcon>
+                        
+                    </label>
+            </div>
+
         </div>
         <div class="sidebar-options-foot">
-            <button class="green__btn-success" @click.prevent="completeForm">
+            <button 
+            :disabled="allowApplyForm"
+            :style="{cursor: allowApplyForm ?  'not-allowed': 'pointer'}"
+            class="green__btn-success" 
+            @click.prevent="completeForm">
                 {{__('Применить')}}
             </button>
             <button :disabled="!EDIT_CONSTRUCTOR_FORM" :style="{cursor: EDIT_CONSTRUCTOR_FORM ?  'pointer': 'not-allowed'}" class="red__btn" @click.prevent="deleteConstructorHandler">
@@ -92,7 +110,7 @@ import { notify } from "@kyvg/vue3-notification";
 import { SvgIcon } from "../globals";
 
 /*
-    keyboard_type -> RKB, IKB -> checkbox
+    keyboard_type -> RKB, IKB -> radio
     start_message -> messageId
     
 */
@@ -121,6 +139,35 @@ const flowChartSideBar = ref();
 const optionsForm: Ref< null | HTMLFormElement > = ref(null)
 const shadowLayer: Ref< HTMLDivElement | null > = ref(null)
 const notAllowValidation = ref(true)
+
+const keyboards = ref([
+    {
+        id: 1,
+        name: 'IKB'
+    },
+    {
+        id: 2,
+        name: 'RKB'
+    }]);
+
+const keyboardType = ref(null);
+
+const keyboardComputed = computed( {
+    get: () => keyboardType.value || currentMessage.value?.keyboard_type || 'IKB',
+    set: (val) => {
+        keyboardType.value = val
+    }
+})
+
+const allowApplyForm = computed(() => {
+    if(EDIT_CONSTRUCTOR_FORM.value) {
+        return false
+    }
+    return !notEditMessageName.value
+})
+
+
+
 
 //LIFE CYCLE
 onMounted(() => {
@@ -186,11 +233,14 @@ function setMessageNameHandler() {          // NOT HANDLED EFFECT WHEN CREATED I
                             messageCred: {
                                 text:  newMessageName.value,
                                 coordinate_x: newMessage.value!.coordinate_x,
-                                coordinate_y: newMessage.value!.coordinate_y
+                                coordinate_y: newMessage.value!.coordinate_y,
+                                keyboard_type: keyboardComputed.value
                             }
                     }).then((res) => {
+
+                        store.commit('messagesReducer/' + MutationTypes.EDIT_CONSTRUCTOR_FORM, true);
                         
-                        afterSetMessageName()
+                        afterSetMessageName();
                         
                     }).catch((err) => {
                         notify({
@@ -206,6 +256,7 @@ function setMessageNameHandler() {          // NOT HANDLED EFFECT WHEN CREATED I
             store.dispatch( 'messagesReducer/' + ActionTypes.UPDATE_CONSTRUCTOR, {
                 ...currentMessage.value,
                 text: newMessageName.value,
+                keyboard_type: keyboardComputed.value
             }).then((res) => {
                 
                 afterSetMessageName();
@@ -239,6 +290,7 @@ function toggleEditMessage () {
 }
 
 function resetAllState () {
+    keyboardType.value = null;
     flowChartSideBar.value.classList.toggle('opened-sidebar');
     
     newMessageName.value = '';
@@ -323,6 +375,9 @@ function deleteLink(option) {
         
     }
 }
+
+
+
 // MAKE FIRST MESSAGE
 function setAsFirstMessage(ev) {
 
@@ -347,6 +402,7 @@ function setAsFirstMessage(ev) {
     }
 
 }
+
 
 
 </script>
@@ -482,7 +538,7 @@ function setAsFirstMessage(ev) {
     }
 
     .first-message{
-        margin-top: 25px;
+        margin: 25px 0;
         display: flex;
         justify-content: end;
         padding-right: 25px;
@@ -543,6 +599,73 @@ function setAsFirstMessage(ev) {
             }
         }
 
+    }
+
+    .keyboard-type {
+        display: flex;
+        justify-content: end;
+
+        &__item {
+            font-size: 22px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            position: relative;
+            display: flex;
+            justify-content: end;
+
+            & span {
+                margin: 0 25px;
+            }
+            
+            &::after {
+                content: '';
+                display: block;
+                border: 1px solid #E4E9F2;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                background: #F7F9FC;
+                cursor: pointer;
+                position: absolute;
+                right: 0;
+                top: 0;
+            }
+            [type="radio"] {
+                position: absolute;
+                display: block;
+                opacity: 0;
+                cursor: pointer;
+                height: 0;
+                width: 0;
+                &:checked ~ .icon__radio-btn {
+                    display: block;
+                }
+            }
+            .icon__radio-btn{
+                border-radius: 4px;
+                width: 20px;
+                height: 20px;
+                cursor: pointer;
+                position: absolute;
+                top: 0;
+                right: 0;
+                z-index: 22;
+    
+                display: none;
+            }
+            
+        }
+        span {
+            font-family: 'Open Sans';
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 20px;
+            color: #8F9BB3;
+            
+        }
+        
     }
 
 </style>
