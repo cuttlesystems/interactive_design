@@ -168,6 +168,8 @@ const mutations = {
 
         state.optionsListTemp.push(newOptionCred);
 
+        state.currentMessage.current_variants.push(newOptionCred);  // show when created
+
         state.constructorList.forEach(constructor => {
             if(constructor.id === state.currentMessage.id){
                 
@@ -193,8 +195,11 @@ const mutations = {
             return constructor
         });
 
-        const optionIdx = state.optionsListTemp.findLastIndex((opt) => opt.id === option.id);
+        let optionIdx = state.optionsListTemp.findLastIndex((opt) => opt.id === option.id);
         state.optionsListTemp.splice(optionIdx, 1);
+        
+        optionIdx = state.currentMessage.current_variants.findLastIndex((opt) => opt.id === option.id);
+        state.currentMessage.current_variants.splice(optionIdx, 1);
 
     },
     

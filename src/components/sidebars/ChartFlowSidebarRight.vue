@@ -60,7 +60,7 @@
 
                 <label class="is__first-message">
 
-                    <input type="checkbox" @change="setAsFirstMessage" :checked="isFirstMesssage" />
+                    <input type="checkbox" @change="setAsFirstMessage" :checked="isFirstMesssage" :disabled="!EDIT_CONSTRUCTOR_FORM" />
 
                     <SvgIcon nameId="checkmark"></SvgIcon>
 
