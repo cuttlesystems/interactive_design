@@ -1,5 +1,6 @@
 <template>
     <div ref="flowChartSideBar" class="messenger-flowchart-sidebar">
+
         <div class="tab-content scrollable-area">
 
             <h5 class="sidebar-options-title sidebar-only">
@@ -82,7 +83,34 @@
                     </label>
             </div>
 
+            <div class="upload-file" ref="uploadContainer">
+
+                <label for="upload-file__input" class="upload-file__label">
+
+                    <SvgIcon nameId="attachment" />
+
+                    <span>
+                        {{__('Прикрепить файл')}}
+                    </span>
+
+                </label>
+
+                <input id="upload-file__input" type="file" @change="uploadHandler"  />
+
+                <div v-if="uploadResult" class="image-container">
+
+                    <img :src="uploadResult" />
+
+                    <svg @click="deleteImageHandler" class="image-container__close" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7.17495 5.99999L10.7583 2.42499C10.9152 2.26807 11.0034 2.05524 11.0034 1.83333C11.0034 1.61141 10.9152 1.39858 10.7583 1.24166C10.6014 1.08474 10.3885 0.996582 10.1666 0.996582C9.9447 0.996582 9.73187 1.08474 9.57495 1.24166L5.99995 4.82499L2.42495 1.24166C2.26803 1.08474 2.0552 0.996582 1.83328 0.996582C1.61136 0.996582 1.39854 1.08474 1.24162 1.24166C1.0847 1.39858 0.996539 1.61141 0.996539 1.83333C0.996539 2.05524 1.0847 2.26807 1.24162 2.42499L4.82495 5.99999L1.24162 9.57499C1.16351 9.65246 1.10151 9.74463 1.05921 9.84618C1.0169 9.94773 0.995117 10.0566 0.995117 10.1667C0.995117 10.2767 1.0169 10.3856 1.05921 10.4871C1.10151 10.5887 1.16351 10.6809 1.24162 10.7583C1.31908 10.8364 1.41125 10.8984 1.5128 10.9407C1.61435 10.983 1.72327 11.0048 1.83328 11.0048C1.94329 11.0048 2.05221 10.983 2.15376 10.9407C2.25531 10.8984 2.34748 10.8364 2.42495 10.7583L5.99995 7.17499L9.57495 10.7583C9.65242 10.8364 9.74459 10.8984 9.84614 10.9407C9.94768 10.983 10.0566 11.0048 10.1666 11.0048C10.2766 11.0048 10.3855 10.983 10.4871 10.9407C10.5886 10.8984 10.6808 10.8364 10.7583 10.7583C10.8364 10.6809 10.8984 10.5887 10.9407 10.4871C10.983 10.3856 11.0048 10.2767 11.0048 10.1667C11.0048 10.0566 10.983 9.94773 10.9407 9.84618C10.8984 9.74463 10.8364 9.65246 10.7583 9.57499L7.17495 5.99999Z" fill="#8F9BB3"/>
+                    </svg>
+
+                </div>
+
+            </div>
+
         </div>
+
         <div class="sidebar-options-foot">
             <button 
             :disabled="allowApplyForm"
@@ -95,6 +123,7 @@
                 {{__('Удалить')}}
             </button>
         </div>
+
     </div>
 </template>
 
@@ -124,6 +153,9 @@ const route = useRoute()
 const newOptionName = ref('')
 const newMessageName = ref('')
 
+const fileUpload: Ref<Blob | null> = ref(null)
+const uploadResult = ref(null)
+
 const EDIT_CONSTRUCTOR_FORM = computed(() => store.state.messagesReducer.EDIT_CONSTRUCTOR_FORM) 
 const optionsListTemp = computed(() => store.state.messagesReducer.optionsListTemp)
 const newMessage = computed(() => store.state.messagesReducer.newMessage)                   // TEMP CONSTRUCTOR
@@ -131,14 +163,17 @@ const newMessage = computed(() => store.state.messagesReducer.newMessage)       
 const currentMessage = computed(() => store.getters[`messagesReducer/getCurrentMessage`])   // AFTER FETCH
 const isFirstMesssage = computed(() => store.state.botsReducer.currentBot.start_message == currentMessage.value?.id)
 
-const notAllowedTypeOptions = ref(true);
+const notAllowedTypeOptions = ref(true)
 const notEditMessageName = ref(false)
+
 
 //NODE
 const flowChartSideBar = ref();
 const optionsForm: Ref< null | HTMLFormElement > = ref(null)
 const shadowLayer: Ref< HTMLDivElement | null > = ref(null)
+const uploadContainer: Ref< HTMLDivElement | null > = ref(null)
 const notAllowValidation = ref(true)
+// const closeIconSVGElement = ref()
 
 const keyboards = ref([
     {
@@ -182,6 +217,9 @@ onMounted(() => {
 watch(() => currentMessage,     // SET INITIALS
     (curVal, preVal) => {
         if(EDIT_CONSTRUCTOR_FORM.value){
+
+            uploadResult.value = currentMessage.value?.photo;
+
             newMessageName.value = currentMessage.value.text;
             afterSetMessageName();
         }
@@ -190,6 +228,18 @@ watch(() => currentMessage,     // SET INITIALS
         deep: true
     }
 )
+
+// watch(() => fileUpload.value,
+//     () => {
+        
+//         closeIconSVGElement.value = document.querySelector('.image-container__close')
+
+//         if(closeIconSVGElement.value) {
+//             closeIconSVGElement.value.addEventListener('click', deleteImageHandler)
+//         }
+
+//     }
+// )
 
 // METHODS
 const newMessageNameHandler = (val) => {
@@ -222,20 +272,47 @@ function addNewOption() {   // Message ID Validate
 }
 function setMessageNameHandler() {          // NOT HANDLED EFFECT WHEN CREATED IT DOUBLED
 
+    
+
     if(!notEditMessageName.value){
 
+        
         v$.value.$touch();
+        
+        const data = new FormData()
+
+        if(fileUpload && !EDIT_CONSTRUCTOR_FORM.value){
+
+            data.append('coordinate_x', newMessage.value!.coordinate_x.toString())
+            data.append('coordinate_y', newMessage.value!.coordinate_y.toString())
+
+        } else {
+
+            for( const [key,value] of Object.entries(currentMessage.value) ) {
+                if( typeof value !== 'object' && typeof value !== null && 'photo' != key ){
+                    data.append(key, typeof value !== 'string' ? (value as number)?.toString() : value )
+                }
+            }
+
+        }
+
+        data.append('photo', fileUpload.value!)
+        data.append('text', newMessageName.value)
+        data.append('keyboard_type', keyboardComputed.value)
+        
 
         if(newMessageName.value && !EDIT_CONSTRUCTOR_FORM.value){
     
             store.dispatch('messagesReducer/' + ActionTypes.CREATE_MESSAGE, {
                             botID: route.query.id,
-                            messageCred: {
-                                text:  newMessageName.value,
-                                coordinate_x: newMessage.value!.coordinate_x,
-                                coordinate_y: newMessage.value!.coordinate_y,
-                                keyboard_type: keyboardComputed.value
-                            }
+                            messageCred: fileUpload.value 
+                                ? data
+                                : {
+                                    text:  newMessageName.value,
+                                    coordinate_x: newMessage.value!.coordinate_x,
+                                    coordinate_y: newMessage.value!.coordinate_y,
+                                    keyboard_type: keyboardComputed.value,
+                                }
                     }).then((res) => {
 
                         store.commit('messagesReducer/' + MutationTypes.EDIT_CONSTRUCTOR_FORM, true);
@@ -252,12 +329,18 @@ function setMessageNameHandler() {          // NOT HANDLED EFFECT WHEN CREATED I
                     })
     
         } else if(EDIT_CONSTRUCTOR_FORM.value) {
+            
+            uploadResult.value ? delete currentMessage.value.photo : currentMessage.value.photo = null;
 
-            store.dispatch( 'messagesReducer/' + ActionTypes.UPDATE_CONSTRUCTOR, {
-                ...currentMessage.value,
-                text: newMessageName.value,
-                keyboard_type: keyboardComputed.value
-            }).then((res) => {
+            store.dispatch( 'messagesReducer/' + ActionTypes.UPDATE_CONSTRUCTOR, fileUpload.value 
+                ? data
+                : {
+                    ...currentMessage.value,
+                    text: newMessageName.value,
+                    keyboard_type: keyboardComputed.value,
+                    
+                }
+            ).then((res) => {
                 
                 afterSetMessageName();
 
@@ -290,6 +373,7 @@ function toggleEditMessage () {
 }
 
 function resetAllState () {
+
     keyboardType.value = null;
     flowChartSideBar.value.classList.toggle('opened-sidebar');
     
@@ -308,6 +392,11 @@ function resetAllState () {
     store.commit('messagesReducer/' + MutationTypes.EDIT_CONSTRUCTOR_FORM, false);
     
     document.querySelector('.op-error')?.classList.remove('op-error');
+    
+    // closeIconSVGElement.value?.parentElement?.remove();
+    // closeIconSVGElement.value = null;
+    fileUpload.value = null;
+    uploadResult.value = null;
 }
 
 async function completeForm(ev) { // COMPLETE FLOW
@@ -372,7 +461,7 @@ function deleteLink(option) {
     const pathEl = document.querySelector(`#fc_path_${option.id}_g`)
     if( pathEl ) {
         pathEl.parentElement?.remove();
-        
+        fileUpload.value = null
     }
 }
 
@@ -402,6 +491,52 @@ function setAsFirstMessage(ev) {
     }
 
 }
+
+//          UPLOAD FILE
+
+function deleteImageHandler( { currentTarget } ) {  // SET NULL PHOTO PATCH
+    // closeIconSVGElement.value = null
+    fileUpload.value = null
+    uploadResult.value = null
+    // currentTarget.parentElement.remove()
+
+}
+
+function uploadHandler({ target : { files } }) {
+
+    // const img = document.createElement("img")
+
+    const reader = new FileReader()
+
+    if( !files.length ){
+        return
+    }
+
+    reader.onload = function ( { target: { readyState, result } } : Event & { target: { result: string, readyState: number } } & any ) {
+        
+        if(readyState === 2){
+
+            // uploadContainer.value!.insertAdjacentHTML('beforeend', `
+            // <div class="image-container">
+            //     <img src="${result}" />
+            //     <svg class="image-container__close" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            //         <path d="M7.17495 5.99999L10.7583 2.42499C10.9152 2.26807 11.0034 2.05524 11.0034 1.83333C11.0034 1.61141 10.9152 1.39858 10.7583 1.24166C10.6014 1.08474 10.3885 0.996582 10.1666 0.996582C9.9447 0.996582 9.73187 1.08474 9.57495 1.24166L5.99995 4.82499L2.42495 1.24166C2.26803 1.08474 2.0552 0.996582 1.83328 0.996582C1.61136 0.996582 1.39854 1.08474 1.24162 1.24166C1.0847 1.39858 0.996539 1.61141 0.996539 1.83333C0.996539 2.05524 1.0847 2.26807 1.24162 2.42499L4.82495 5.99999L1.24162 9.57499C1.16351 9.65246 1.10151 9.74463 1.05921 9.84618C1.0169 9.94773 0.995117 10.0566 0.995117 10.1667C0.995117 10.2767 1.0169 10.3856 1.05921 10.4871C1.10151 10.5887 1.16351 10.6809 1.24162 10.7583C1.31908 10.8364 1.41125 10.8984 1.5128 10.9407C1.61435 10.983 1.72327 11.0048 1.83328 11.0048C1.94329 11.0048 2.05221 10.983 2.15376 10.9407C2.25531 10.8984 2.34748 10.8364 2.42495 10.7583L5.99995 7.17499L9.57495 10.7583C9.65242 10.8364 9.74459 10.8984 9.84614 10.9407C9.94768 10.983 10.0566 11.0048 10.1666 11.0048C10.2766 11.0048 10.3855 10.983 10.4871 10.9407C10.5886 10.8984 10.6808 10.8364 10.7583 10.7583C10.8364 10.6809 10.8984 10.5887 10.9407 10.4871C10.983 10.3856 11.0048 10.2767 11.0048 10.1667C11.0048 10.0566 10.983 9.94773 10.9407 9.84618C10.8984 9.74463 10.8364 9.65246 10.7583 9.57499L7.17495 5.99999Z" fill="#8F9BB3"/>
+            //     </svg>
+            // </div>
+            // `);
+
+            uploadResult.value = result;
+
+            fileUpload.value = files[0];
+
+        }
+
+    }
+
+    reader.readAsDataURL(files[0])
+
+}
+
 
 
 
@@ -604,7 +739,7 @@ function setAsFirstMessage(ev) {
     .keyboard-type {
         display: flex;
         justify-content: end;
-
+        margin: 25px 0;
         &__item {
             font-size: 22px;
             -webkit-user-select: none;
@@ -666,6 +801,56 @@ function setAsFirstMessage(ev) {
             
         }
         
+    }
+
+    @include b(upload-file){
+        text-align: right;
+        
+        & input[type="file"] {
+            display: none;
+        }
+
+        @include e(label){
+            cursor: pointer;
+
+            & .icon__attachment {
+                width: 20px;
+                height: 20px;
+            }
+
+            & span {
+                color: #3DBCCC;
+                
+                position: relative;
+                bottom: 5px;
+                font-family: 'Open Sans';
+                font-weight: 700;
+                font-size: 14px;
+                line-height: 16px;
+            }
+        }
+
+
+    }
+    
+    @include b(image-container){
+
+        background: #F7F9FC;
+        border-radius: 6px;
+        position: relative;
+        width: 150px;
+        margin: 10px 20px 0 auto;
+
+        & svg {
+            cursor: pointer;
+            position: absolute;
+            width: 20px;
+            height: 20px;
+
+            right: 5px;
+            top: 5px;
+        }
+
     }
 
 </style>

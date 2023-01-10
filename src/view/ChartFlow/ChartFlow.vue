@@ -216,6 +216,7 @@ const controlLink = ref({});
 const constrolLinkLayer = ref({});
 const shadowLayer: Ref<HTMLDivElement | null> = ref(null)
 
+
 // NODES
 const sideBarRef: Ref<null | HTMLDivElement> = ref(null)
 
@@ -435,7 +436,11 @@ onMounted(() => {
     // alert('DUPLICATED DATA STORE WHEN MAKE LINK && SOMETIMES UNDEFINED ID LINK');
     // alert('SELECT RADIO && START MESSAGE && EVENT EMITTER && DATA PROVIDER && STREAM');
     // alert('ALLOW TO DELETE MESSAGE && MUST HAVE TO SET NAME OF MESSAGE && PHOTO && VIDEO && FILE && POLYGON && RECT && CI/CD && NGINX ALL ROUTES && VOLUMES')
-
+    // alert('SOMETIMES LINKS DO NOT MOVE')
+    alert( 'FIX BUG && IMAGE FEAT && NGINX( LINK | SERVE ALL PATH TO FRONT ) ' )
+    alert( ' COMPLETE TWO COURCES && MOREE/MOST PRACTISE ' )
+    alert( ' WHEN DELETE DOUBLED ' )
+    alert( ' UPDATE && RESET WHEN CLOSE && RESET WHEN REUPLOAD ' )
 
     sideBarRef.value = document.querySelector('.messenger-flowchart-sidebar');
 });

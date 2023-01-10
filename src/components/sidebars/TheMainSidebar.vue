@@ -7,14 +7,14 @@
                     <span class="main-sidebar__text">{{__('Главная')}}</span>
                 </router-link>
             </li>
-            <li class="main-sidebar__item">
+            <!-- <li class="main-sidebar__item">
                 <router-link :to="{name: 'tree', params: {
                     treeId: 1
                 }}">
                     <SvgIcon :nameId="route.name === 'tree' ? 'list--blue' : 'list'" />
                     <span class="main-sidebar__text">{{__('Tree')}}</span>    
                 </router-link>
-            </li>
+            </li> -->
             <!-- SET ICON BLUE -->
             <!-- <li class="main-sidebar__item">                 
                 <router-link :to="{name: 'profile'}">

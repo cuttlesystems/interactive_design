@@ -309,7 +309,8 @@ class ManageCardConstructor implements IManageCardConstructor { // Playing insid
             store.dispatch('messagesReducer/' + ActionTypes.UPDATE_CONSTRUCTOR, {
                 id: this.#selectedConstructor!.dataset.constructorid,    // TO FIND APPROPRIATE CONSTRUCTOR
                 coordinate_x: this.computedPositionX,
-                coordinate_y: this.computedPositionY
+                coordinate_y: this.computedPositionY,
+                delete_photo: true
             })
             
         }

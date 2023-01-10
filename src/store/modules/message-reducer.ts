@@ -135,13 +135,21 @@ const mutations = {
     [MutationTypes.UPDATE_CONSTRUCTOR](state, updatedConstructor){  //  USED UPDATE NAME CONSTRUCTOR && UPDATE COORDINATE CONSTRUCTOR
         
         state.constructorList.forEach((constructor) => {
+
             if(parseInt(updatedConstructor.id) === parseInt(constructor.id)) {
+
                 state.newMessage = {...constructor};
 
+                if( updatedConstructor.hasOwnProperty('delete_photo') ){
+                    delete constructor.photo
+                    delete updatedConstructor.delete_photo
+                }
+                
                 Object.assign(constructor, updatedConstructor);
                 
                 state.currentMessage = constructor;
             }
+
             return constructor
         });
 
@@ -150,7 +158,7 @@ const mutations = {
         const foundIndexConstructor = state.constructorList.findIndex((constructor) => constructor.id == constructorId);
         state.constructorList.splice(foundIndexConstructor, 1);
     },
-    //
+    //  
 
     [MutationTypes.SET_CURRENT_MESSAGE](state, currentMessage){
         state.currentMessage = currentMessage
@@ -233,6 +241,7 @@ const mutations = {
             if( constructor.id != optionCred.current_message && constructor.id != optionCred.next_message ){
                 
                 const foundIdxOption = constructor.next_variants.findIndex((option) => option.id == optionCred.id)
+
                 if(foundIdxOption !== -1) {
                     constructor.next_variants.splice(foundIdxOption, 1)
                 }
@@ -267,6 +276,7 @@ const actions = {
             const res = await messagesAPI.getMessages(botID);
             
             if(res.status === 200){
+
                 context.commit(MutationTypes.SET_INITIAL_CONSTRUCTOR_LIST, res.data)
 
                 // context.commit(MutationTypes.ATTACH_COMPUTED_PATH_POSITION)
@@ -282,7 +292,8 @@ const actions = {
 
     async [ActionTypes.CREATE_MESSAGE](context , { botID, messageCred }){
         try {
-            const res = await messagesAPI.createMessage( botID, messageCred );
+            
+            const res = await messagesAPI.createMessage( botID, messageCred, messageCred instanceof FormData );
             
             if(res.status === 201) {
     
@@ -307,10 +318,29 @@ const actions = {
 
     async [ActionTypes.UPDATE_CONSTRUCTOR](context, updatedConstructor){    // change state inside && fire mutation in promise
         //  CALLED FROM MANAGE CONSTRUCTOR AND EDIT FORM
-        context.commit(MutationTypes.UPDATE_CONSTRUCTOR, updatedConstructor);
-        const res = await messagesAPI.updateMessage(context.state.currentMessage.id, context.state.currentMessage);
+        let res
+
+        if( updatedConstructor instanceof FormData ){
+
+            res = await messagesAPI.updateMessage(context.state.currentMessage.id, updatedConstructor, true);
+
+        } else {
+
+            context.commit(MutationTypes.UPDATE_CONSTRUCTOR, updatedConstructor);
+
+            res = await messagesAPI.updateMessage(context.state.currentMessage.id, context.state.currentMessage, false);
+            
+        }
+        
+        
         if(res.status !== 200) {    // HANDLE move or reset
+
             context.commit(MutationTypes.UPDATE_CONSTRUCTOR, context.state.newMessage);
+
+        } else if(res.status === 200) {
+
+            context.commit(MutationTypes.UPDATE_CONSTRUCTOR, res.data);
+
         }
         return Promise.resolve(res)
     },
