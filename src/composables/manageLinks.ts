@@ -60,13 +60,12 @@ class ManageLinks implements IManageLinks{
         // line svg
         
         if( ev.target.classList.contains('flowchart-operator-connector-arrow') 
-        && !ev.path.find((el) => el.classList?.contains('flowchart-operator-inputs')) 
+        && !ev.composedPath().find((el) => el.classList?.contains('flowchart-operator-inputs')) 
         && this.#arrowOutput.classList.contains('flowchart-operator-connector-small-arrow')
         ) {    // SET IF NOT INPUT AND CONNECTOR
             
             this.#isCreateLink = true;
-            this.parentOutputConstructor = ev.path.find((el) => el.classList.contains('flowchart-operator'));
-            
+            this.parentOutputConstructor = ev.composedPath().find((el) => el.classList.contains('flowchart-operator'));
 
             this.#outputArrowPosition = this.#arrowOutput.getBoundingClientRect();        // get output dot position
             
@@ -90,7 +89,7 @@ class ManageLinks implements IManageLinks{
         // this.parentInputConstructor = ev.path.find((el) => el?.classList?.contains('flowchart-operator'));
         const arrowInput = ev.target.nextElementSibling;        // get input dot position
 
-        const isInput = ev.path.find((el) => el?.classList?.contains('flowchart-operator-inputs'));
+        const isInput = ev.composedPath().find((el) => el?.classList?.contains('flowchart-operator-inputs'));
 
         if( ev.target.classList.contains('flowchart-operator-connector-arrow') 
             && this.#isCreateLink 

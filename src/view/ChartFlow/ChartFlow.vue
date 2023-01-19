@@ -446,7 +446,7 @@ onMounted(() => {
     // alert( ' FEAT ZOOM && COMMAND ' )
     // alert( ' DESIGN STATIC BLOCK ( BOT && ACCORDION ) ' )
     // alert( ' CONFIG SERVER && MODAL COMMAND FROM LOGICPLUS ' )
-    // alert( ' domen_hosy ' )
+    // alert( ' REMOVE LISTENER WHEN DIFFERENT PAGE ' )
 
     sideBarRef.value = document.querySelector('.messenger-flowchart-sidebar');
 });
