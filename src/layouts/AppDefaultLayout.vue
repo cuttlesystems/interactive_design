@@ -3,13 +3,18 @@
     <EditorNavbar />
 
     <div class="constructor-container">
+
         <TheSidebar @getSelectedConstructor="getSelectedConstructor" />
+
         <main class="flowchart-column constructor-container__item">
+
             <slot :selectedConstructor="selectedConstructor" 
-                  :isMoved="isMoved"
-                  :mousePosition="mousePosition"
-                  />
+                :isMoved="isMoved"
+                :mousePosition="mousePosition"
+                />
+
         </main>
+
     </div>
     
 </template>
@@ -20,6 +25,7 @@ import { EditorNavbar, TheSidebar } from '~/components'
 import {useMouse} from '@cs/useMouse'
 import { isRef, reactive, ref, watch } from '@vue/runtime-core'
 import { useEventListener } from '~/composables/useEventListener'
+
 
 const selectedConstructor = ref()
 let   isMoved             = ref(false)
@@ -65,7 +71,7 @@ function mouseMoveHandler(ev: MouseEvent) {
     mousePosition.mouseMoveXPosition = ev.pageX;
     mousePosition.mouseMoveYPosition = ev.pageY;
     
-    console.log('fired')
+    // console.log('fired')
     
     if(selectedConstructor.value.classList.contains('structure-elements__item')){
         isMoved.value = true;

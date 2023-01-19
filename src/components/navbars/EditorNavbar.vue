@@ -8,9 +8,12 @@
                 <div class="constructor-header__inner-tools">
                     
                 </div>
-                <button class="white__btn" @click="saveTemplateHandler">
-                    {{__('Сохранить')}}
-                </button>
+                <div class="constructor-header__inner-right">
+                    <button class="white__btn" @click="commandHandler">{{__('Комманды')}}</button>
+                    <button class="white__btn" @click="saveTemplateHandler">
+                        {{__('Сохранить')}}
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -21,6 +24,7 @@
 
 <script setup lang="ts">
 import { notify } from '@kyvg/vue3-notification';
+import { onMounted, Ref, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from '~/store';
 import { ActionTypes } from '~/store/modules/action-types';
@@ -29,6 +33,23 @@ import { MutationTypes } from '~/store/modules/mutations-types';
 const route = useRoute();
 const router = useRouter();
 const store = useStore();
+
+// REFERENCE
+const commandSidebar: Ref<null | HTMLDivElement> = ref(null)
+const shadowLayer: Ref<null | HTMLDivElement> = ref(null)
+
+
+//  LIFECYCLE
+
+onMounted(() => {
+
+    commandSidebar.value = document.querySelector('.command-sidebar')
+    shadowLayer.value = document.querySelector('.shadow__layer')
+
+})
+
+
+// METHODS
 
 function saveTemplateHandler(ev) {  // RESET ALL STATES CONSTRUCTOR
 
@@ -60,6 +81,26 @@ function saveTemplateHandler(ev) {  // RESET ALL STATES CONSTRUCTOR
     router.go(-1);
 }
 
+function commandHandler(){
+    
+    if( (shadowLayer.value?.style.getPropertyValue('display') == 'none' 
+        || shadowLayer.value?.style.getPropertyValue('display') == '') 
+        ){
+
+        commandSidebar.value?.classList.toggle('command-sidebar__open');
+        (shadowLayer.value as HTMLDivElement ).style.display = 'block';
+        store.commit('messagesReducer/' + MutationTypes.IS_BLOCK_SIDEBAR, true)
+
+    } else {
+
+        commandSidebar.value?.classList.toggle('command-sidebar__open');
+        (shadowLayer.value as HTMLDivElement ).style.display = 'none';
+        store.commit('messagesReducer/' + MutationTypes.IS_BLOCK_SIDEBAR, false)
+
+    }
+
+}
+
 
 </script>
 
@@ -84,6 +125,12 @@ function saveTemplateHandler(ev) {  // RESET ALL STATES CONSTRUCTOR
             justify-content: space-between;
 
         }
+
+        @include e(inner-right) {
+            display: flex;
+            gap: 25px;
+        }
+
     }
 
 </style>

@@ -7,6 +7,7 @@ import { MutationTypes } from './modules/mutations-types';
 import authReducer, { AuthState } from './modules/auth-reducer';
 import botsReducer, { BotsState } from './modules/bots-reducer';
 import messagesReducer, { MessageState } from './modules/message-reducer';
+import commandReducer, { CommandState } from './modules/command-reducer';
 
 import withOutToken, { withToken } from '~/api';
 import { authAPI } from '~/api/auth';
@@ -33,6 +34,7 @@ export interface RootState {
     messagesReducer: MessageState;
     authReducer: AuthState;
     botsReducer: BotsState;
+    commandReducer: CommandState;
 
 
     currentBot: {};
@@ -103,7 +105,8 @@ export default createStore<RootState>({
     modules: {
         authReducer,
         botsReducer,
-        messagesReducer
+        messagesReducer,
+        commandReducer
     },
     strict: debug,
     plugins: debug ? [createLogger()] : []

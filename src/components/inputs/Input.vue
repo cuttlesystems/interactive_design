@@ -83,6 +83,8 @@ export default defineComponent({
 
 <style lang="scss" scoped>
     @include b(custom-input){
+        position: relative;
+        padding-bottom: 20px;
         @include e(label){
             text-align: left;
             font-weight: 400;
@@ -94,6 +96,9 @@ export default defineComponent({
         @include e(error){
             text-align: right;
             display: block;
+            position: absolute;
+            bottom: 0;
+            right: 0;
         }
         input {
             font-weight: 400;
