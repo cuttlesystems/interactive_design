@@ -1,149 +1,115 @@
 <template>
-    <div class="main-page">
-        <div class="container">
+    <div ref="mainPage" class="main-page">
             
-            <div class="main-page__tools">
-                <button class="green__btn" @click="structureBotHandler">
-                    <SvgIcon nameId="enter" />
-                {{__('Структура бота')}}
-                </button>
+            <!-- <SvgIcon class="bg-icon" :nameId="isDark ? 'main-bg-dark' : 'main-bg-white'" /> -->
+            <div v-if="!isDark" class="flash-bg"></div>
 
-                <button class="blue__btn" @click="createBotHandler">
-                    <SvgIcon nameId="plus" />
-                    {{__('Создать Бота')}}
-                </button>
+            <div class="main-page__inner">
 
-                <button class="blue__btn" @click="startBotHandler">
-                    <!-- <SvgIcon nameId="plus" /> -->
-                    {{__('ЗАПУСТИТЬ Бота')}}
-                </button>
+                <router-view></router-view>
+                
+                <!-- <div class="main-page__tools">
+                    <button class="green__btn" @click="structureBotHandler">
+                        <SvgIcon nameId="enter" />
+                        {{__('Структура бота')}}
+                    </button> -->
+    
+                    <!-- <button class="blue__btn" @click="createBotHandler">
+                        <SvgIcon nameId="plus" />
+                        {{__('Создать Бота')}}
+                    </button> -->
+                    <!-- <div>
+                        <button class="blue__btn" @click="startBotHandler">
+                            {{__('ЗАПУСТИТЬ Бота')}}
+                        </button>
+        
+                        <button class="blue__btn" @click="stopBotHandler">
+                            {{__('ОСТАНОВИТЬ Бота')}}
+                        </button>
+                    </div>
 
-                <button class="blue__btn" @click="stopBotHandler">
-                    <!-- <SvgIcon nameId="plus" /> -->
-                    {{__('ОСТАНОВИТЬ Бота')}}
-                </button>
+                </div> -->
+
             </div>
             
-        </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { notify } from "@kyvg/vue3-notification";
-import { computed } from "vue";
+
+import { computed, Ref, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { SvgIcon } from "~/components";
 import { useStore } from "~/store";
 import { ActionTypes } from "~/store/modules/action-types";
 import { MutationTypes } from "~/store/modules/mutations-types";
 
-const store = useStore();
+//                  HOOKS
+const store = useStore(); 
 const router = useRouter();
-const currentBotId =  computed(() => store.getters['botsReducer/getCurrentBotId'])
+
+//                  STATE
+const mainPage: Ref<HTMLDivElement | null> = ref(null)
+
+//                  COMPUTED
+const isDark = computed(() => store.state.darkMode)
 
 
-function structureBotHandler(){
-    
-    if(currentBotId.value){
-        router.push({
-        name: 'chart',
-        query:{    
-            id: currentBotId.value
-        },
-    })
-    }else {
-        notify({
-            group: 'app',
-            type: 'error',
-            title: 'Выберите бота',
-        })
+
+//                  WACTHERS
+watch(isDark,
+    () => {
+        if(isDark.value) mainPage.value!.style.background = `bottom / contain no-repeat url(${require("~/assets/icons/black-bg-picture.png")})`;
+        else mainPage.value!.style.background = `bottom / contain no-repeat url(${require("~/assets/icons/white-bg-picture.png")})`;
     }
-    
-}
+)
+//                  METHODS
 
-function createBotHandler() {
 
-    store.commit(MutationTypes.SET_CURRENT_LAYOUT, 'EmptyLayout')
-    router.push({
-        name: 'create-bot'
-    })
-}
+// function createBotHandler() {
 
-const startBotHandler = () => {
+//     store.commit(MutationTypes.SET_CURRENT_LAYOUT, 'EmptyLayout')
 
-    if(currentBotId.value){
-        
-        store.dispatch('botsReducer/' + ActionTypes.BOT_TOGGLER, {
-            botId: currentBotId.value,
-            type: 'start'
-        }).then(() => {
-            notify({
-                group: 'app',
-                type: 'success',
-                title: 'Бот успешно запущено',
-            })
-        }).catch(() => {
-            notify({
-                group: 'app',
-                type: 'error',
-                title: 'Ошибка',
-            })
-        })
+//     router.push({
+//         name: 'create-bot'
+//     })
 
-    } else {
-        
-        notify({
-            group: 'app',
-            type: 'error',
-            title: 'Выберите бота',
-        })
-    }
+// }
 
-    
 
-}
-
-const stopBotHandler = () => {
-    if(currentBotId.value){
-        store.dispatch('botsReducer/' + ActionTypes.BOT_TOGGLER, {
-            botId: currentBotId.value,
-            type: 'stop'
-        }).then(() => {
-            notify({
-                group: 'app',
-                type: 'success',
-                title: 'Бот успешно остановлен',
-            })
-
-        }).catch(() => {
-            notify({
-                group: 'app',
-                type: 'error',
-                title: 'Ошибка',
-            })
-        })
-    }else {
-        notify({
-            group: 'app',
-            type: 'error',
-            title: 'Выберите бота',
-        })
-    }
-
-    
-}
 
 
 </script>
 
 <style lang="scss">
 
+
+
 @include b(main-page) {
+    
+    width: 100%;
+    height: 100%;
+
+    position: relative;
+
+    background: bottom / contain no-repeat  url("../../assets/icons/white-bg-picture.png");
+
+    @include e(inner){
+        z-index: 5;
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
 
     @include e(tools) {
         display: flex;
-        margin-top: 25px;
         gap: 30px;
+        justify-content: space-between;
+        & button {
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 22px;
+        }
     }
     
 }
@@ -158,5 +124,17 @@ const stopBotHandler = () => {
         height: 20px;
     }
 }
-    
+ 
+.flash-bg {
+    width: 100%;
+    height: 100%;
+    content: "";
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    background-color: rgba(241,241,241, 0.96)
+}
+
 </style>

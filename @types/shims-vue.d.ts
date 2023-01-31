@@ -7,3 +7,5 @@ declare module '*.vue' {
 }
 
 type Nullable<T> = T | null;
+
+declare module "*.png"

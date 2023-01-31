@@ -66,10 +66,13 @@ const actions = {
         const localStorage: typeof LocalStorageService = LocalStorageService.getService();
         
         const res = await authAPI.login(credentials);
+
         if(res.status === 200) {
             commit(MutationTypes.SET_USER_CREDENTIALS, res.data)
             localStorage.setToken(res.data.auth_token)
         }
+        
+        return res
     },
     async [ActionTypes.INITIALIZE_USER](context){
         const res = await authAPI.getUserInfo();

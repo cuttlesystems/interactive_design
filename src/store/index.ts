@@ -37,8 +37,8 @@ export interface RootState {
     commandReducer: CommandState;
 
 
-    currentBot: {};
-    isExpandSideBar: boolean;
+    //isExpandSideBar: boolean;
+    darkMode: boolean;
     
 }
 
@@ -53,8 +53,9 @@ export default createStore<RootState>({
         initialized: false,
         ejectInstanseAxios: {},
         currentLayout: 'MainLayout',
-        currentBot: {},
-        isExpandSideBar: true,
+        //isExpandSideBar: true,
+
+        darkMode: false
     } as RootState,
 
     getters: {
@@ -62,7 +63,8 @@ export default createStore<RootState>({
         translate: (state,getters) => (text, parameters) => {
             
             return text
-        }
+        },
+        getMode: (state) => state.darkMode
     },
 
     mutations:{
@@ -72,16 +74,17 @@ export default createStore<RootState>({
         [MutationTypes.SET_EJECT_AXIOS](state, ejectInstanseAxios){
             state.ejectInstanseAxios = ejectInstanseAxios
         },
-        [MutationTypes.SET_CURRENT_BOT](state, bot) {
-            state.currentBot = bot
-            state.botsReducer.currentBot = bot
-        },
-        [MutationTypes.SET_IS_EXPAND_SIDEBAR](state, bool) {
-            state.isExpandSideBar = bool
-        },
+        
+        // [MutationTypes.SET_IS_EXPAND_SIDEBAR](state, bool) {
+        //     state.isExpandSideBar = bool
+        // },
         [MutationTypes.SET_CURRENT_LAYOUT](state, layout) {
             state.currentLayout = layout
-        }
+        },
+
+        [MutationTypes.SET_DARK_MODE](state, darkMode: boolean){
+            state.darkMode = darkMode
+        },
     },
 
     actions: {

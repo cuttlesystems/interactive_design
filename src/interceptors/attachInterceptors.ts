@@ -22,7 +22,7 @@ export default ( [withToken, withOutToken], store ) => {   // initial req done()
 
     router.afterEach((to, from) => {
 
-        if( [ 'login', 'registration', 'main', 'tree' ].includes(to.name as string) ){
+        if( [ 'login', 'registration', 'main', 'entry' ].includes(to.name as string) ){
 
             nprogress.done();
 
@@ -54,8 +54,6 @@ export default ( [withToken, withOutToken], store ) => {   // initial req done()
         }))
 
         ejectInstanceAxiosResponce.push(instance.interceptors.response.use((res: AxiosResponse): AxiosResponse => {
-
-            
 
             nprogress.done();
 

@@ -27,6 +27,7 @@
             font-weight: 700;
             font-size: 18px;
             line-height: 34px;
+            color: var(--black);
             
         }
         @include e(inner){

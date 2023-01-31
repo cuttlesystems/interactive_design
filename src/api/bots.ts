@@ -7,6 +7,12 @@ export const botAPI = {
     getBots(){
         return withToken.get('bots/')
     },
+    getActiveBots(){
+        return withToken.get('bots/get_all_starting_bots/')
+    },
+    getBotsById(botId){
+        return withToken.get(`bots/${botId}/`)
+    },
     updateBot(botId, botCred){
         return withToken.patch(`bots/${botId}/`, botCred)
     },

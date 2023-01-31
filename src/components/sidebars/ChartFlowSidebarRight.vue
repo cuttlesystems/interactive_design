@@ -679,7 +679,7 @@ function uploadHandler({ target : { files } }) {
         padding-right: 25px;
 
         span {
-            font-family: 'Open Sans';
+            font-family: 'Product Sans';
             font-weight: 400;
             font-size: 16px;
             line-height: 20px;
@@ -793,7 +793,7 @@ function uploadHandler({ target : { files } }) {
             
         }
         span {
-            font-family: 'Open Sans';
+            font-family: 'Product Sans';
             font-weight: 400;
             font-size: 16px;
             line-height: 20px;
@@ -823,7 +823,7 @@ function uploadHandler({ target : { files } }) {
                 
                 position: relative;
                 bottom: 5px;
-                font-family: 'Open Sans';
+                font-family: 'Product Sans';
                 font-weight: 700;
                 font-size: 14px;
                 line-height: 16px;

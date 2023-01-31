@@ -1,27 +1,36 @@
 <template>
 
-    <header class="header">
-        <TheMainNavbar />
-    </header>
+    <div class="constructor-container"
+        :style="{
+            height: route.name !== 'chart' && '100vh'
+        }"
+    >
 
-    <div class="constructor-container">
         <TheMainSidebar />
 
-        <main class="flowchart-column constructor-container__item main-page__wrapper">
-            <!-- mousePosition, isMoved, selectedConstructor -->
-            <slot               
-                
-            />
-        </main>
+        <div class="constructor-container__content">
+            <header class="header">
+                <TheMainNavbar />
+            </header>
+            <main class="flowchart-column constructor-container__item main-page__wrapper">
+                <!-- mousePosition, isMoved, selectedConstructor -->
+                <slot               
+                    
+                />
+            </main>
+        </div>
+
     </div>
 
 </template>
 
 
 <script setup lang="ts">
+import { useRoute } from 'vue-router'
 import { TheMainSidebar } from '~/components'
 import { TheMainNavbar } from '~/components'
 
+const route = useRoute()
 
 </script>
 
@@ -33,10 +42,17 @@ import { TheMainNavbar } from '~/components'
         box-shadow: 0px 8px 16px rgba(143, 155, 179, 0.16);
     }
     .main-page__wrapper{
-        background: #F1F4F9;
+        background: var(--main-bg);
     }
     .constructor-container{
+        
         box-shadow: 0px 8px 16px rgba(143, 155, 179, 0.16);
+        table-layout: fixed;
+
+        &__content{
+            height: 100%;
+            display: table-cell;
+        }
     }
 
 </style>

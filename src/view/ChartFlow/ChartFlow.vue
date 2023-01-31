@@ -17,7 +17,7 @@
                     @click.stop.prevent="onConstructorSelectHandler($event,item)"
                     :data-constructorid="item.id"
                 >
-                <!-- :data-uuid="item.uuid" -->
+                    <!-- :data-uuid="item.uuid" -->
                     <div class="flowchart-operator-inputs">
                         <div class="flowchart-operator-connector-set">
                             <div class="flowchart-operator-connector">
@@ -216,7 +216,7 @@ const controlMap = ref({});
 const controlConstructor = ref({});
 const controlLink = ref({});
 const constrolLinkLayer = ref({});
-const shadowLayer: Ref<HTMLDivElement | null> = ref(null)
+const shadowLayer: Ref<HTMLDivElement | null> = ref(null);
 
 
 // NODES
@@ -250,7 +250,6 @@ watch(() => props.isMoved,(moved,prevModev) => {
                     REDUCERS.MESSAGES + MutationTypes.EDIT_CONSTRUCTOR_LIST,
                     {
                         tempName: INITIAL_VALUE.TEMP_NAME_CONSTRUCTOR,
-                        
                     }
                 );
 
@@ -260,7 +259,7 @@ watch(() => props.isMoved,(moved,prevModev) => {
                 //     className: props.selectedConstructor.dataset.name === 'Email' ? 'op-message' : '',
                 // });
 
-            //}else {
+            //} else {
                 //uuid = getUUID();
                 // constructorList.value.push({
                 //     uuid,
@@ -403,7 +402,8 @@ watch(() => store.state.messagesReducer.currentMessage,
 // const emits = defineEmits([''])     // pass name emit -> cb
 
 onMounted(() => {
-    
+
+        
     flowChartPosition.value  = flowchart.value!.getBoundingClientRect();
     
     controlMap.value         = new ManageConstructorMap( flowchart.value as HTMLDivElement );
@@ -412,12 +412,11 @@ onMounted(() => {
 
     controlLink.value        = new ManageLinks( constrolLinkLayer.value as SVGElement, chartFlowPosition, store );
 
-
     console.log( flowChartPosition.value );
     console.log( controlMap.value );
     console.log( controlLink.value, 'link' );
     // controlMap.initialize
-    store.dispatch('messagesReducer/' + ActionTypes.GET_MESSAGE_LIST, route.query.id).then((res) => {
+    store.dispatch('messagesReducer/' + ActionTypes.GET_MESSAGE_LIST, route.query.id || route.query.botId).then((res) => {
         optionListAll.value = res.map( ( constructor ) => constructor.current_variants!.map((option) => {
 
             if( option.next_message ){
@@ -447,9 +446,13 @@ onMounted(() => {
     // alert( ' DESIGN STATIC BLOCK ( BOT && ACCORDION ) ' )
     // alert( ' CONFIG SERVER && MODAL COMMAND FROM LOGICPLUS ' )
     // alert( ' REMOVE LISTENER WHEN DIFFERENT PAGE ' )
+    // alert( ' DESIGN && DARK MODE ' )
+
+    alert( 'CHECK LINKS && COORDINATE OF LINKS PADDING' )
 
     sideBarRef.value = document.querySelector('.messenger-flowchart-sidebar');
 });
+
 //  WHEN MOVE GET ID CONSTRUCTOR AND FIND ALL INPUTS && OUTPUTS
     
 
@@ -465,6 +468,7 @@ onUnmounted(() => {
         y: 0,
         isClicked: false
     }) as ConstructorPositionType
+    
 
     (controlMap.value as ManageConstructorMap).moveBlockEl.removeEventListener('mousedown',(controlMap.value as ManageConstructorMap).onMouseDownId );
     removeEventListener('mouseup',( controlMap.value as ManageConstructorMap).onMouseUpId );
@@ -474,6 +478,7 @@ onUnmounted(() => {
 
     removeEventListener('mouseup', (controlLink.value as ManageLinks).onMouseDownId);
     removeEventListener('mousedown', (controlLink.value as ManageLinks).onMouseUpHandlerId);
+
 });
 
 

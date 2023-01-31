@@ -28,7 +28,7 @@ export default defineComponent<AppComponentProps,AppComponentData>({
     },
 
     setup(){
-        const blankRouteList = ref(['login','registration'])
+        const blankRouteList = ref(['login','registration', 'entry'])
         const store = useStore();
         const route = useRoute()
 
@@ -44,6 +44,7 @@ export default defineComponent<AppComponentProps,AppComponentData>({
 
         return {
             isAuth: computed(() => store.getters.getToken),
+            isDark: computed(() => store.state.darkMode),
             currentLayout:  computed(() => route.meta.layout || store.state.currentLayout),
             blankRouteList,
         }

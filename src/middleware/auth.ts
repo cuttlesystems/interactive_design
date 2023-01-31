@@ -2,7 +2,7 @@
         
         if( !authToken ){
             return next({
-                name: 'registration',
+                name: 'login',
                 query: { redirect: location.pathname }
             })
         }

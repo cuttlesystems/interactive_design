@@ -12,6 +12,8 @@
     }">
         IN PROGRESS!!!
     </div> -->
+    <SvgIcon class="bg-icon" :nameId="isDark ? 'grid-black-bg' : 'grid-bg'" v-if="blankRouteList.includes($route.name)" />
+
     <component :is="currentLayout" v-slot="slotProps" v-if="!blankRouteList.includes($route.name) && isAuth">
         <router-view
             v-bind="slotProps"
@@ -78,7 +80,20 @@ two types of volume ANONYM and NAMED
 */
 </script>
 <style lang="scss">
+
     #nprogress {
         z-index: 999999999999 !important;
     }
+
+    .bg-icon {
+        opacity: 0.07;
+        filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+
+        position: absolute;
+        left: 0;
+        top: -4%;
+        width: 100%;
+        height: 100%;
+    }
+
 </style>

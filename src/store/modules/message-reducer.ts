@@ -407,7 +407,7 @@ const actions = {
                                                                     // NEED NEXT CONSTRUCTOR ID
 
         let optionPayload = {
-            next_message: optionCred.constructorId
+            next_message: parseInt(optionCred.constructorId)
         };
         
         try {

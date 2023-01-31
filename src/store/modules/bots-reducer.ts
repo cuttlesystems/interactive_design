@@ -12,9 +12,9 @@ export interface SingleBotType {
     start_message: string | null
 }
 export interface BotsState {
-    bots: Array<SingleBotType>,
-    currentBot: SingleBotType,
-    
+    bots: Array<SingleBotType>;
+    currentBot: SingleBotType;
+    activeBots: Array<number>;
 }
 
 const state = (): BotsState => ({
@@ -26,7 +26,8 @@ const state = (): BotsState => ({
         owner: null,
         start_message: ''
     },
-    bots: []
+    bots: [],
+    activeBots: []
 }) 
 
 const getters = {
@@ -41,6 +42,20 @@ const mutations = {
 
     [MutationTypes.SET_BOT_START_MESSAGE](state, start_message){
         state.currentBot.start_message = start_message;
+    },
+
+    [MutationTypes.SET_CURRENT_BOT](state, bot) {
+        state.currentBot = bot
+    },
+    [MutationTypes.SET_ACTIVE_BOTS](state, bot) {
+        state.activeBots = bot
+    },
+    [MutationTypes.APPEND_ACTIVE_BOT](state, botId) {
+        state.activeBots.push(botId)
+    },
+    [MutationTypes.REMOVE_ACTIVE_BOT](state, botId) {
+        const foundIndex = state.activeBots.findIndex(botId)
+        state.activeBots.splice(foundIndex, 1)
     },
 
 }
@@ -62,6 +77,23 @@ const actions = {
         
     },
 
+    async [ActionTypes.GET_ACTIVE_BOTS](context) {
+
+        const res = await botAPI.getActiveBots()
+        context.commit(MutationTypes.SET_ACTIVE_BOTS, res.data)
+
+        return res
+    },
+
+    async [ActionTypes.GET_BOT_BY_ID](context, botId) {
+
+        const res = await botAPI.getBotsById(botId)
+
+        context.commit(MutationTypes.SET_CURRENT_BOT, res.data)
+
+        return res
+    },
+
     [ActionTypes.CREATE_BOT](context ,botCredentials){
         return Promise.resolve(botAPI.createBot(botCredentials))
     },
@@ -75,9 +107,17 @@ const actions = {
 
         switch(config.type) {
             case 'start':
-                res = await botAPI.startBot(config.botId);break;
+                res = await botAPI.startBot(config.botId);
+                if(res.status === 200) {
+                    context.commit( MutationTypes.SET_CURRENT_BOT, parseInt(config.botId) )
+                }
+                break;
             case 'stop':
-                res = await botAPI.stopBot(config.botId);break;
+                res = await botAPI.stopBot(config.botId);
+                if(res.status === 200) {
+                    context.commit( MutationTypes.REMOVE_ACTIVE_BOT, parseInt(config.botId) )
+                }
+                break;
             default:
                 return Promise.reject('Try again')
         }

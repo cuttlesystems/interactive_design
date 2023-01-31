@@ -1,25 +1,42 @@
 <template>
     <div class="login">
+
         <div class="login__inner">
             <form @submit.prevent="submitHandler" class="form">
-                <h1 class="form__title">Welcome to <br />Cuttle System</h1>
+                <h1 class="form__title">Добро пожаловать <br />на БОТ-систему</h1>
                 
-                <input type="text" name="username" class="form__input" placeholder="Введите логин" 
-                    v-model="state.username"
-                    @blur="v$.username.$touch"
-                    />
-                <div class="form__input--error" v-if="v$.username.$dirty && v$.username.required.$invalid">{{ 'Поле не должно быть пустым' }}</div>
-                <div class="form__input--error" v-if="v$.username.$dirty && v$.username.maxLengthValue.$invalid">{{ `Максимальное количество символов ${v$.username.maxLengthValue.$params.max}` }}</div>
+                <div class="form__field-box">
+                    <input type="text" name="username" class="form__input" placeholder="Введите логин" 
+                        v-model="state.username"
+                        @blur="v$.username.$touch"
+                        />
+                    <div class="form__input--error" v-if="v$.username.$dirty && v$.username.required.$invalid">{{ 'Поле не должно быть пустым' }}</div>
+                    <div class="form__input--error" v-if="v$.username.$dirty && v$.username.maxLengthValue.$invalid">{{ `Максимальное количество символов ${v$.username.maxLengthValue.$params.max}` }}</div>
+                </div>
 
-                <input type="password" name="password" class="form__input" placeholder="Введите пароль"
-                    v-model="state.password" 
-                    @blur="v$.password.$touch"
+                <div class="form__field-box">
+                    
+                    <!-- <input type="password" name="password" class="form__input" placeholder="Введите пароль"
+                        :eyeIcon="true"
+                        v-model="state.password" 
+                        @blur="v$.password.$touch"
+                        /> -->
+                    <Input 
+                        :notAllowValidation="true"
+                        :eyeIcon="true"
+                        :value="state.password"
+                        @onChange="(val) => state.password = val"
+                        placeholder="Введите пароль"
                     />
-                <div class="form__input--error" v-if="v$.password.$dirty && v$.password.required.$invalid">{{ 'Поле не должно быть пустым' }}</div>
-                <div class="form__input--error" v-if="v$.password.$dirty && v$.password.firstCharacter.$invalid">{{ 'Ошибка валидации' }}</div>
-                <div class="form__input--error" v-if="errors.loginField">{{ errors.loginField }}</div>
-                <router-link :to="{ name: 'registration' }">{{__('Регистрация')}}</router-link>
+                    <div class="form__input--error" v-if="v$.password.$dirty && v$.password.required.$invalid">{{ 'Поле не должно быть пустым' }}</div>
+                    <!-- <div class="form__input--error" v-if="v$.password.$dirty && v$.password.firstCharacter.$invalid">{{ 'Ошибка валидации' }}</div> -->
+                    <div class="form__input--error" v-if="errors.loginField">{{ errors.loginField }}</div>
+                </div>
+
+                <DarkSwitcher />
+
                 <input type="submit" class="form__btn" />
+                
             </form>
             
         </div>
@@ -39,14 +56,8 @@
 
 <style lang="scss">
     @include b(login){
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
+        
+
         a {
             color: inherit;
             font-weight: 400;
@@ -57,32 +68,43 @@
             color: #3DBCCC;
         }
         @include e(inner){
-            padding: 32px;
+            padding: 20px 40px;
             box-shadow: 0px 16px 30px rgba(34, 43, 69, 0.2);
-            border-radius: 8px;
-            font-size: 16px;
-            line-height: 16px;
-            max-width: 405px;
-            width: 100%;
+            background: #FFFFFF;
+            border-radius: 22px;
         }
     }
     @include b(form){
+
+        @include e(field-box){
+            position: relative;
+            margin: 25px 0;
+            &:nth-child(3){
+                margin-bottom: 50px;
+            }
+        }
+
         @include e(title){
-            font-weight: 700;
-            font-size: 22px;
+
+            font-weight: 400;
+            font-size: 24px;
+            line-height: 36px;
             text-align: center;
             max-width: 250px;
             margin: auto;
-            line-height: 31px;
+            
         }
+
         @include e(input){
             width: 100%;
             position: relative;
             background: #fff;
-            margin: 10px 0;
-            border-radius: 6px;
-            border: 1px solid #E4E9F2;
+            
+            border: 1px solid rgba(204, 204, 204, 0.35);
+            border-radius: 16px;
+
             padding: 10px 16px;
+
             &::-webkit-outer-spin-button,
             &::-webkit-inner-spin-button {
                 -webkit-appearance: none;
@@ -96,14 +118,18 @@
             }
             @include m(error) {
                 color: #ac1c00;
-                font-size: 13px;
+                font-size: 14px;
                 text-align: right;
                 margin-left: auto;
-                /*position: absolute;*/
+                position: absolute;
                 bottom: -20px;
                 right: 0;
+                &:not(:nth-child(2)){
+                    bottom: -40px;
+                }
             }
         }
+
         @include e(btn){
 
             display: flex;
@@ -111,7 +137,7 @@
             justify-content: center;
             width: 100%;
             padding: 12px;
-            border-radius: 4px;
+            border-radius: 16px;    
             background-color: #3DBCCC;
             border: 1px solid transparent;
             outline: none;
@@ -122,5 +148,9 @@
 
             margin: 20px 0;
         }
+
     }
+
+   
+
 </style>

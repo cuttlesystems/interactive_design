@@ -4,9 +4,14 @@
 
     <div class="constructor-container">
 
-        <TheSidebar @getSelectedConstructor="getSelectedConstructor" />
+        <TheSidebar class="fixed__config-editor" 
+            @getSelectedConstructor="getSelectedConstructor" />
 
-        <main class="flowchart-column constructor-container__item">
+        <main 
+            :class="{
+                'edit-constructor': route.name === 'chart',
+            }"
+            class="flowchart-column constructor-container__item">
 
             <slot :selectedConstructor="selectedConstructor" 
                 :isMoved="isMoved"
@@ -25,15 +30,20 @@ import { EditorNavbar, TheSidebar } from '~/components'
 import {useMouse} from '@cs/useMouse'
 import { isRef, reactive, ref, watch } from '@vue/runtime-core'
 import { useEventListener } from '~/composables/useEventListener'
+import { useRoute } from 'vue-router'
 
 
+//          HOOKS
+const route = useRoute()
+
+//
 const selectedConstructor = ref()
 let   isMoved             = ref(false)
 const mousePosition = reactive({
     mouseMoveXPosition: 0,
     mouseMoveYPosition: 0
-})
-    
+})    
+
 // let { mouseMoveXPosition, mouseMoveYPosition } = useMouse();
 
 function getSelectedConstructor( selectedItem ){            // mouseup fired before click
@@ -97,16 +107,21 @@ useEventListener({ target: window, event: 'mouseup', cb: mouseUpHandler })
 
 
 @include b(constructor-container) {
+    
     position: relative;
     display: table;
-    height: calc(100vh - 75px);
     width: 100%;
     overflow: hidden;
+
+    height: calc(100vh - 75px);
+
     @include e(item){
-        height: calc(100vh - 75px);
-        display: table-cell;
+
+        height: calc(100% - 64px);
+        
         vertical-align: top;
         transition: all 90ms ease-in-out 45ms;
+
     }
 }
 @include b(toolbar){
@@ -116,7 +131,19 @@ useEventListener({ target: window, event: 'mouseup', cb: mouseUpHandler })
 }
 @include b(flowchart-column){
     position: relative;
-    width: calc(100vw - 100px);
+    width: calc(100vw - 65px);
 }
+
+.edit-constructor {
+    width: calc(100vw - 100px);
+    display: table-cell;
+}
+
+.fixed__config-editor {
+    height: calc(100vh - 75px);
+    display: table-cell;
+
+}
+
 
 </style>
