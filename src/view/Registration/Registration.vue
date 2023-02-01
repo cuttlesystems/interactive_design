@@ -71,8 +71,8 @@ import { ActionTypes } from "~/store/modules/action-types";
 const store = useStore()
 
 onMounted(() => {
-    alert('validate && main page')
-    alert('  ')
+    // alert('validate && main page')
+    // alert('  ')
 })
 
 const state = reactive({

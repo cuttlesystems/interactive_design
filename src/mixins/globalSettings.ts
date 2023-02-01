@@ -5,7 +5,6 @@ import { defineComponent } from "vue";
 export default defineComponent({
     methods: {
         __(text, parametrs = {}){
-            console.log('robit')
             return this.$store.getters.translate(text, parametrs)
         }
     },

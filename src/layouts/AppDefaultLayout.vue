@@ -5,7 +5,8 @@
     <div class="constructor-container">
 
         <TheSidebar class="fixed__config-editor" 
-            @getSelectedConstructor="getSelectedConstructor" />
+            @getSelectedConstructor="getSelectedConstructor" 
+        />
 
         <main 
             :class="{
@@ -49,7 +50,7 @@ const mousePosition = reactive({
 function getSelectedConstructor( selectedItem ){            // mouseup fired before click
 
     // selectedConstructor.value = selectedItem;
-
+    
 }
 
 // watch(

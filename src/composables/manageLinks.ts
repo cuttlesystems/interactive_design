@@ -29,7 +29,9 @@ class ManageLinks implements IManageLinks{
 
     onMouseDownId: (ev) => void;
     onMouseUpHandlerId: (ev) => void;
+    reset: () => void;
     #onMouseMoveHadnlerId: (ev) => void;
+    controller;
 
     #outputArrowPosition: DOMRect;
     #inputArrowPosition: DOMRect;
@@ -46,10 +48,17 @@ class ManageLinks implements IManageLinks{
 
         this.onMouseDownId = this.onMouseDownHandler.bind(this)
         this.onMouseUpHandlerId = this.onMouseUpHandler.bind(this)
+        this.reset = this._reset.bind(this)
         this.#onMouseMoveHadnlerId = this.onMouseMoveHandler.bind(this)
 
-        addEventListener('mousedown', this.onMouseDownId)
-        addEventListener('mouseup', this.onMouseUpHandlerId)
+        this.controller = new AbortController()
+
+        addEventListener('mousedown', this.onMouseDownId,{
+            signal: this.controller.signal
+        })
+        addEventListener('mouseup', this.onMouseUpHandlerId,{
+            signal: this.controller.signal
+        })
         
     }
 
@@ -96,7 +105,7 @@ class ManageLinks implements IManageLinks{
             && this.parentOutputConstructor?.dataset.constructorid !== arrowInput.dataset.constructorid 
             && isInput
             ){
-
+                console.log(' CONNECTION LINKED FIRED  ')
             this.store.dispatch( 'messagesReducer/' + ActionTypes.UPDATE_OPTION, {
                 optionId: this.#arrowOutput.dataset.optionid,
                 constructorId: arrowInput.dataset.constructorid,
@@ -163,6 +172,14 @@ class ManageLinks implements IManageLinks{
 
         removeEventListener('mousemove', this.#onMouseMoveHadnlerId);
 
+    }
+
+    _reset() {
+
+        //removeEventListener('mouseup', this.onMouseDownId);
+        this.controller.abort();
+        //removeEventListener('mousedown', this.onMouseUpHandlerId);
+        
     }
 
 }

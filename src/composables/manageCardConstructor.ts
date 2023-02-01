@@ -93,6 +93,8 @@ class ManageCardConstructor implements IManageCardConstructor { // Playing insid
     computedInputLinkXLeft: number;
     computedInputLinkYLeft: number;
 
+    controller;
+
     dotsPositionOutput: DotsPosition;
     dotsPositionInput: DotsPosition;
 
@@ -104,9 +106,15 @@ class ManageCardConstructor implements IManageCardConstructor { // Playing insid
         this.mouseUpId   = this.onMouseUp.bind(this)
         this.mouseMoveId   = this.onMouseMove.bind(this)
 
-        addEventListener('mousedown', this.mouseDownId)
+        this.controller = new AbortController()
 
-        addEventListener('mouseup', this.mouseUpId)
+        addEventListener('mousedown', this.mouseDownId,{
+            signal: this.controller.signal
+        })
+
+        addEventListener('mouseup', this.mouseUpId,{
+            signal: this.controller.signal
+        })
 
         // _cardConstructor.addEventListener('mouseleave', this.mouseLeave.bind(this))     // creates new instance, multiply event listener / click
         // console.log(_mouseMoveXPosition, _mouseMoveYPosition, 'positions')
@@ -337,6 +345,13 @@ class ManageCardConstructor implements IManageCardConstructor { // Playing insid
 
     mouseLeave() {
         console.log(this)
+    }
+
+    reset() {
+        this.controller.abort();
+        // removeEventListener('mousedown', this.mouseDownId );
+        // removeEventListener('mouseup', this.mouseUpId );
+        
     }
 
 }

@@ -402,8 +402,6 @@ watch(() => store.state.messagesReducer.currentMessage,
 // const emits = defineEmits([''])     // pass name emit -> cb
 
 onMounted(() => {
-
-        
     flowChartPosition.value  = flowchart.value!.getBoundingClientRect();
     
     controlMap.value         = new ManageConstructorMap( flowchart.value as HTMLDivElement );
@@ -448,7 +446,7 @@ onMounted(() => {
     // alert( ' REMOVE LISTENER WHEN DIFFERENT PAGE ' )
     // alert( ' DESIGN && DARK MODE ' )
 
-    alert( 'CHECK LINKS && COORDINATE OF LINKS PADDING' )
+    // alert( 'CHECK LINKS && COORDINATE OF LINKS PADDING' )
 
     sideBarRef.value = document.querySelector('.messenger-flowchart-sidebar');
 });
@@ -469,16 +467,9 @@ onUnmounted(() => {
         isClicked: false
     }) as ConstructorPositionType
     
-
-    (controlMap.value as ManageConstructorMap).moveBlockEl.removeEventListener('mousedown',(controlMap.value as ManageConstructorMap).onMouseDownId );
-    removeEventListener('mouseup',( controlMap.value as ManageConstructorMap).onMouseUpId );
-
-    removeEventListener('mousedown', ( controlConstructor.value as ManageCardConstructor).mouseDownId );
-    removeEventListener('mouseup', ( controlConstructor.value as ManageCardConstructor).mouseUpId );
-
-    removeEventListener('mouseup', (controlLink.value as ManageLinks).onMouseDownId);
-    removeEventListener('mousedown', (controlLink.value as ManageLinks).onMouseUpHandlerId);
-
+    ( controlMap.value as ManageConstructorMap).reset();
+    ( controlConstructor.value as ManageCardConstructor ).reset();
+    ( controlLink.value as ManageLinks ).reset();
 });
 
 

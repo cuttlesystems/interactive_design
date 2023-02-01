@@ -156,6 +156,8 @@ class ManageConstructorMap implements IManageConstuctorMap {
     distancePositionX: Number;
     distancePositionY: Number;
 
+    controller;
+
     #moveMapId: () => void
 
     onMouseDownId: (ev:MouseEvent) => void
@@ -166,10 +168,17 @@ class ManageConstructorMap implements IManageConstuctorMap {
     constructor(protected _moveBlockEl: HTMLDivElement){
 
         this.onMouseUpId = this.onMouseUp.bind(this)
-
         this.onMouseDownId = this.onMouseDown.bind(this);
-        _moveBlockEl.addEventListener('mousedown', this.onMouseDownId );
-        addEventListener('mouseup', this.onMouseUpId);
+
+        this.controller = new AbortController();
+
+        _moveBlockEl.addEventListener('mousedown', this.onMouseDownId,{
+            signal: this.controller.signal
+        });
+
+        addEventListener('mouseup', this.onMouseUpId,{
+            signal: this.controller.signal
+        });
 
     }
 
@@ -262,6 +271,12 @@ class ManageConstructorMap implements IManageConstuctorMap {
         chartFlowPosition.y         = this.computedDistanceY || 0;
         
         this.#onMouseMoveHandler! && removeEventListener('mousemove', this.#onMouseMoveHandler)
+    }
+
+    reset() {
+        this.controller.abort();
+        // this._moveBlockEl.removeEventListener('mousedown',this.onMouseDownId );
+        // removeEventListener('mouseup',this.onMouseUpId );
     }
 
 }
