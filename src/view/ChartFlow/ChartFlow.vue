@@ -430,23 +430,20 @@ onMounted(() => {
     // alert('WHEN MOVE GET ID CONSTRUCTOR AND FIND ALL INPUTS && OUTPUTS ------- INITIAL CREATE NOT ALLOWED DELETE OPTIONS')
     // alert('WHEN DELETE CONSTRUCTOR REMOVE ALL LINKS && OPTION WHEN ATTACHED TWO CONSTRUCTOR SIDE EFFECT')
     // alert('DUPLICATED DATA AND DOUBLED REQUEST PATCH LINK STACK EXECUTES MOUSEMOVE')
-    // alert(' MOVE CHARTFLOW AND POLYGON RECT ')
     // alert('DUPLICATED DATA STORE WHEN MAKE LINK && SOMETIMES UNDEFINED ID LINK');
     // alert('SELECT RADIO && START MESSAGE && EVENT EMITTER && DATA PROVIDER && STREAM');
     // alert('ALLOW TO DELETE MESSAGE && MUST HAVE TO SET NAME OF MESSAGE && PHOTO && VIDEO && FILE && POLYGON && RECT && CI/CD && NGINX ALL ROUTES && VOLUMES')
     // alert('SOMETIMES LINKS DO NOT MOVE')
     // alert( 'FIX BUG && IMAGE FEAT && NGINX( LINK | SERVE ALL PATH TO FRONT ) ' )
     // alert( ' COMPLETE TWO COURCES && MOREE/MOST PRACTISE ' )
-    // alert( ' WHEN DELETE DOUBLED ' )
-    // alert( ' UPDATE && RESET WHEN CLOSE && RESET WHEN REUPLOAD ' )
-    // alert( ' when linked two messages it is not static ' )
-    // alert( ' FEAT ZOOM && COMMAND ' )
-    // alert( ' DESIGN STATIC BLOCK ( BOT && ACCORDION ) ' )
+    
     // alert( ' CONFIG SERVER && MODAL COMMAND FROM LOGICPLUS ' )
-    // alert( ' REMOVE LISTENER WHEN DIFFERENT PAGE ' )
-    // alert( ' DESIGN && DARK MODE ' )
 
-    // alert( 'CHECK LINKS && COORDINATE OF LINKS PADDING' )
+    // alert( ' FEAT ZOOM && COMMAND ' )
+    // alert( ' when linked two messages it is not static ' )
+    // alert( ' WHEN DELETE DOUBLED ' )
+    // alert( ' MOVE CHARTFLOW AND POLYGON RECT ')
+    alert( 'TOKEN VALID && START MESSAGE MUST BE TAKEN' )
 
     sideBarRef.value = document.querySelector('.messenger-flowchart-sidebar');
 });

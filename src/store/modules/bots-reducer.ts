@@ -54,7 +54,7 @@ const mutations = {
         state.activeBots.push(botId)
     },
     [MutationTypes.REMOVE_ACTIVE_BOT](state, botId) {
-        const foundIndex = state.activeBots.findIndex(botId)
+        const foundIndex = state.activeBots.findIndex((activeBotId) => botId === activeBotId)
         state.activeBots.splice(foundIndex, 1)
     },
 
@@ -104,12 +104,11 @@ const actions = {
     async [ActionTypes.BOT_TOGGLER](context, config){
 
         let res;
-
         switch(config.type) {
             case 'start':
                 res = await botAPI.startBot(config.botId);
                 if(res.status === 200) {
-                    context.commit( MutationTypes.SET_CURRENT_BOT, parseInt(config.botId) )
+                    context.commit( MutationTypes.APPEND_ACTIVE_BOT, parseInt(config.botId) )
                 }
                 break;
             case 'stop':
@@ -118,8 +117,6 @@ const actions = {
                     context.commit( MutationTypes.REMOVE_ACTIVE_BOT, parseInt(config.botId) )
                 }
                 break;
-            default:
-                return Promise.reject('Try again')
         }
         
         return res
