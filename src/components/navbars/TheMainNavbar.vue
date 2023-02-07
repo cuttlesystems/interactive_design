@@ -78,6 +78,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { BotsState, SingleBotType } from '~/store/modules/bots-reducer'
 import LocalStorageService from '~/utils/LocalStorageService';
 import { DarkSwitcher } from '../globals';
+import { notify } from '@kyvg/vue3-notification';
 
 const store = useStore();
 const route = useRoute();
@@ -155,10 +156,18 @@ function toggleProfileHandler (ev) {
 
 function quitHandler(ev) {
 
-    storage.reset();
-    store.commit('authReducer/' + MutationTypes.SET_USER_CREDENTIALS, '');
-    router.push( { name: 'login' } );
-    
+    store.dispatch('authReducer/' + ActionTypes.LOGOUT).then((res) => {
+        router.push( { name: 'login' } );
+        storage.reset();
+        store.commit('authReducer/' + MutationTypes.SET_USER_CREDENTIALS, '');
+    }).catch((err) => {
+        notify({
+            group: 'app',
+            type: 'error',
+            title: 'Ошибка',
+        })
+        console.error(err)
+    })
 
 }
 

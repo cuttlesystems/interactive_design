@@ -5,15 +5,24 @@
         <div class="container">
         
             <div class="constructor-header__inner">
+
                 <div class="constructor-header__inner-tools">
-                    
+                    <SvgIcon class="icon__only-icon" 
+                            nameId="back-btn"
+                            @click="handleBackArrow" 
+                        />
+                    <span>{{currentBot.name}}</span>
                 </div>
+
+                <DarkSwitcher />
+                
                 <div class="constructor-header__inner-right">
                     <button class="white__btn" @click="commandHandler">{{__('Комманды')}}</button>
                     <button class="white__btn" @click="saveTemplateHandler">
                         {{__('Сохранить')}}
                     </button>
                 </div>
+
             </div>
 
         </div>
@@ -24,19 +33,21 @@
 
 <script setup lang="ts">
 import { notify } from '@kyvg/vue3-notification';
-import { onMounted, Ref, ref } from 'vue';
+import { computed, onMounted, Ref, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from '~/store';
 import { ActionTypes } from '~/store/modules/action-types';
 import { MutationTypes } from '~/store/modules/mutations-types';
-
+import { DarkSwitcher, SvgIcon } from '../globals';
 const route = useRoute();
 const router = useRouter();
 const store = useStore();
-
 // REFERENCE
 const commandSidebar: Ref<null | HTMLDivElement> = ref(null)
 const shadowLayer: Ref<null | HTMLDivElement> = ref(null)
+
+// COMPUTED
+const currentBot = computed(() => store.state.botsReducer.currentBot)
 
 
 //  LIFECYCLE
@@ -101,6 +112,10 @@ function commandHandler(){
 
 }
 
+function handleBackArrow() {
+    router.go(-1)
+}
+
 
 </script>
 
@@ -108,7 +123,7 @@ function commandHandler(){
     
     @include b(constructor-header) {
         box-shadow: 0 4px 10px #00000026;
-        background-color: #0097b7;
+        background-color: #ffffff;
         color: #fff;
         min-height: 75px;
         user-select: none;
@@ -123,6 +138,24 @@ function commandHandler(){
         @include e(inner) {
             display: flex;
             justify-content: space-between;
+
+            &-tools {
+
+                display: flex;
+                align-items: center;
+                gap: 12px;
+
+                & svg {
+                    cursor: pointer;
+                }
+
+                & span {
+                    color: #292A2F;
+                    font-weight: 400;
+                    font-size: 20px;
+                    line-height: 24px;
+                }
+            }
 
         }
 

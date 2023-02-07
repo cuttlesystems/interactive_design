@@ -92,7 +92,7 @@ async function submitHandler() {
     
     console.log(v$.value)
     console.log(await v$.value.$validate(), 'isVALIDs')
-    debugger
+    // debugger
 
     if(state.username && state.email && state.password){
         store.dispatch('authReducer/' + ActionTypes.REGISTRATION, state)

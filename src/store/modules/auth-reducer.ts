@@ -83,7 +83,12 @@ const actions = {
     async [ActionTypes.REGISTRATION](context, registrCred) {
         const res = await authAPI.registration(registrCred)
         return res
-    }
+    },
+    async [ActionTypes.LOGOUT](context) {
+        const res = await authAPI.logout()
+        return res
+    },
+
 }
 
 

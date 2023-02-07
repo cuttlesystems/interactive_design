@@ -153,7 +153,7 @@ const stopBotHandler = () => {
             botId: currentBotId.value,
             type: 'stop'
         }).then(() => {
-            debugger
+            // debugger
             notify({
                 group: 'app',
                 type: 'success',

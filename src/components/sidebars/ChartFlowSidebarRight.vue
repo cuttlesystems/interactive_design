@@ -309,8 +309,8 @@ function setMessageNameHandler() {          // NOT HANDLED EFFECT WHEN CREATED I
                                 ? data
                                 : {
                                     text:  newMessageName.value,
-                                    coordinate_x: newMessage.value!.coordinate_x,
-                                    coordinate_y: newMessage.value!.coordinate_y,
+                                    coordinate_x: parseInt(newMessage.value!.coordinate_x as unknown as string),
+                                    coordinate_y: parseInt(newMessage.value!.coordinate_y as unknown as string),
                                     keyboard_type: keyboardComputed.value,
                                 }
                     }).then((res) => {

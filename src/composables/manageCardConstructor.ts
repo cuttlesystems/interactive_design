@@ -122,8 +122,6 @@ class ManageCardConstructor implements IManageCardConstructor { // Playing insid
     }
 
     onMouseDown(ev: MouseEvent) {           // SETS TWO POINTS
-
-        console.log('MOUSE DOWN EVENT')
         
         if((ev.target as HTMLDivElement).classList.contains('flowchart-operator')){ // OVER CONSTRUCTOR
 
@@ -314,10 +312,11 @@ class ManageCardConstructor implements IManageCardConstructor { // Playing insid
         ) {
 
             this.#IS_MOVE = false;
+            
             store.dispatch('messagesReducer/' + ActionTypes.UPDATE_CONSTRUCTOR, {
                 id: this.#selectedConstructor!.dataset.constructorid,    // TO FIND APPROPRIATE CONSTRUCTOR
-                coordinate_x: this.computedPositionX,
-                coordinate_y: this.computedPositionY,
+                coordinate_x: parseInt(this.computedPositionX as unknown as string),
+                coordinate_y: parseInt(this.computedPositionY as unknown as string),
                 delete_photo: true
             })
             

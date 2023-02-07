@@ -181,7 +181,7 @@ const commandSidebar: Ref<  HTMLDivElement | null > = ref(null)
 onMounted(() => {
     
     shadowLayer.value = document.querySelector('.shadow__layer')
-    store.dispatch( 'commandReducer/' + ActionTypes.GET_LIST_COMMAND )
+    store.dispatch( 'commandReducer/' + ActionTypes.GET_LIST_COMMAND, route.query.botId )
 
 })
 

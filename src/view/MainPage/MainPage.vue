@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 
-import { computed, Ref, ref, watch } from "vue";
+import { computed, onMounted, Ref, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { SvgIcon } from "~/components";
 import { useStore } from "~/store";
@@ -59,12 +59,18 @@ const isDark = computed(() => store.state.darkMode)
 //                  WACTHERS
 watch(isDark,
     () => {
-        if(isDark.value) mainPage.value!.style.background = `bottom / contain no-repeat url(${require("~/assets/icons/black-bg-picture.png")})`;
-        else mainPage.value!.style.background = `bottom / contain no-repeat url(${require("~/assets/icons/white-bg-picture.png")})`;
+        changeBackground()
     }
 )
 //                  METHODS
-
+function changeBackground() {
+    if(isDark.value) mainPage.value!.style.background = `bottom / contain no-repeat url(${require("~/assets/icons/black-bg-picture.png")})`;
+    else mainPage.value!.style.background = `bottom / contain no-repeat url(${require("~/assets/icons/white-bg-picture.png")})`;
+}
+//                  LIFECYCLE
+onMounted(() => {
+    changeBackground()
+})
 
 // function createBotHandler() {
 

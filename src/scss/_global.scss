@@ -8,8 +8,17 @@ body {
 
 :root {
   --bot-body: #FFFFFF;
+  --message-body: #ffffff;
+  --option-bg: #F1F1F1;
 
   --active-info: #4DAAFF;
+
+  --flowchart-bg: #F1F1F1;
+  --grid-bg: linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+             linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+  --flowchart-map-bg: #CCCCCC;
+  --tooltip-text: rgba(23, 23, 23, 0.4);
+  --connector-dot: #969696;
 
   --sidebar-bg: #171717;
   --white: #f2f5f5;
@@ -42,9 +51,18 @@ body {
 
 .dark-mode {
   --bot-body: #616367;
+  --message-body: #7a7c82;
+  --option-bg: #FFFFFF;
 
   --active-info: #39B292;
   --clear-white-text: #ffffff;
+
+  --flowchart-bg: #27282b;
+  --grid-bg: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+             linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  --flowchart-map-bg: #3A3C41;
+  --tooltip-text: rgba(255, 255, 255, 0.5);
+  --connector-dot: #5FE3FF;
 
   --sidebar-bg: #292A2F;
   --main-bg: #3A3C41;
@@ -218,7 +236,7 @@ body {
 }
 
 .scrollable {
-  overflow: auto;
+  overflow: visible;
   height: calc(100vh - 75px);
 }
 .scrollable::-webkit-scrollbar {
@@ -297,8 +315,8 @@ body {
 }
 
 .white__btn {
-  background-color: #fff;
-  color: #00829d;
+  background-color: #0097b7;;
+  color: #ffffff;
 
   @extend .blue__btn
 }

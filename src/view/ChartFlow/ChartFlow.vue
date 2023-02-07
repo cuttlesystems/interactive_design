@@ -1,5 +1,5 @@
 <template>
-    <div  class="scrollable-area">
+    <div ref="rootFlowChart" class="scrollable-area">
         <div ref="shadowLayer" class="shadow__layer"></div>
         <div ref="flowchart" class="flowchart flowchart-container">
             
@@ -14,7 +14,7 @@
                         'left': `${ item.coordinate_x || mouseMoveXPosition }px`,
                         'top': `${ item.coordinate_y || mouseMoveYPosition }px`,
                     }"
-                    @click.stop.prevent="onConstructorSelectHandler($event,item)"
+                    @click.stop.prevent="route.name === 'chart' ? onConstructorSelectHandler($event,item): () => null"
                     :data-constructorid="item.id"
                 >
                     <!-- :data-uuid="item.uuid" -->
@@ -46,6 +46,9 @@
                                 class="element-btn-wrap">
                                 <li v-for="option of item.current_variants"
                                     :key="option.id"
+                                    :style="{
+                                        background: option.next_message ? '#4DAAFF': '#CCCCCC'
+                                    }"
                                     class="element-btn element-btn-postback">
                                     <span>{{option.text}}</span>
                                     <div class="flowchart-operator-connector-set">
@@ -103,17 +106,17 @@
                             <polygon stroke="none" fill="black" :points="option.computePolygonPosition"></polygon>
                         </mask>
                         <g class="flowchart-link" :data-link_id="option.id" :id="`fc_path_${option.id}_g`" >
-                            <path :id="`fc__path-${option.id}`" stroke-width="3" fill="none" :d="option.computePathPosition"
-                            stroke="#3366ff"></path>
-                            <rect :x="option?.computeRectPosition?.x" :y="option?.computeRectPosition?.y" width="11" height="2" fill="#3366ff" stroke="none" :mask="`fc_mask_${option.id}`" />
+                            <path :id="`fc__path-${option.id}`" stroke-width="3" stroke-dasharray="8" fill="none" :d="option.computePathPosition"
+                            stroke="#969696"></path>
+                            <rect :x="option?.computeRectPosition?.x" :y="option?.computeRectPosition?.y" width="11" height="2" fill="#969696" stroke="none" :mask="`fc_mask_${option.id}`" />
                         </g>
 
                     </g>
                 </g>
             </svg>
 
-            <svg class="flowchart-temporary-link-layer" :style="{display:'none'}">
-                <line x1="90" y1="94.42500305175781" x2="148.20001220703125" y2="132.8000030517578" stroke-dasharray="6,6" stroke-width="4" stroke="black" fill="none"></line>
+            <svg ref="strightLine" class="flowchart-temporary-link-layer" :style="{display:'none'}">
+                <line x1="90" y1="94.42500305175781" x2="148.20001220703125" y2="132.8000030517578"  stroke-width="4" stroke="#969696" fill="none"></line>
             </svg>
 
         </div>
@@ -202,7 +205,7 @@ const props = withDefaults(defineProps<ComponentPropsType>(), {
     mousePosition: {
         mouseMoveXPosition: 0,
         mouseMoveYPosition: 0
-    }
+    },
 })
 
 //  HOOKS
@@ -221,8 +224,9 @@ const shadowLayer: Ref<HTMLDivElement | null> = ref(null);
 
 // NODES
 const sideBarRef: Ref<null | HTMLDivElement> = ref(null)
-
+const rootFlowChart: Ref< null | HTMLDivElement | DOMRect > = ref(null)
 let currentConstructorUUID = ref()
+const strightLine = ref()
 
 //  GLOBAL LIST
 const constructorList: Ref<Array<MessageType>> = computed( () => store.state.messagesReducer.constructorList );
@@ -408,11 +412,12 @@ onMounted(() => {
 
     controlConstructor.value = new ManageCardConstructor( constrolLinkLayer.value as SVGElement, store, chartFlowPosition );
 
-    controlLink.value        = new ManageLinks( constrolLinkLayer.value as SVGElement, chartFlowPosition, store );
+    controlLink.value        = new ManageLinks( constrolLinkLayer.value as SVGElement, chartFlowPosition, store, strightLine.value );
 
     console.log( flowChartPosition.value );
     console.log( controlMap.value );
     console.log( controlLink.value, 'link' );
+
     // controlMap.initialize
     store.dispatch('messagesReducer/' + ActionTypes.GET_MESSAGE_LIST, route.query.id || route.query.botId).then((res) => {
         optionListAll.value = res.map( ( constructor ) => constructor.current_variants!.map((option) => {
@@ -427,6 +432,7 @@ onMounted(() => {
         })
         ).flat(3)
     });
+    
     // alert('WHEN MOVE GET ID CONSTRUCTOR AND FIND ALL INPUTS && OUTPUTS ------- INITIAL CREATE NOT ALLOWED DELETE OPTIONS')
     // alert('WHEN DELETE CONSTRUCTOR REMOVE ALL LINKS && OPTION WHEN ATTACHED TWO CONSTRUCTOR SIDE EFFECT')
     // alert('DUPLICATED DATA AND DOUBLED REQUEST PATCH LINK STACK EXECUTES MOUSEMOVE')
@@ -443,9 +449,18 @@ onMounted(() => {
     // alert( ' when linked two messages it is not static ' )
     // alert( ' WHEN DELETE DOUBLED ' )
     // alert( ' MOVE CHARTFLOW AND POLYGON RECT ')
-    alert( 'TOKEN VALID && START MESSAGE MUST BE TAKEN' )
+    // alert( `TOKEN VALID && START MESSAGE MUST BE TAKEN && REGISTER VALIDATION && NGINX && PHOTO && ERROR MESSAGE TYPE && 403
+    //     && COMMAND && CHECK ALL HANDLER && POLYGON && BLOCK MAIN PAGE MODAL && MESSAGE NOT TOCHABLE FIELD -> PROD
+    // ` )
+    // alert( 'COLOR && FIX UNSELECTABLE AREA' )
+    
+    // alert ( ' TOP EDGE ARROW ' )
 
     sideBarRef.value = document.querySelector('.messenger-flowchart-sidebar');
+    
+    if(route.name === 'bot') {
+        resetHandlers();
+    }
 });
 
 //  WHEN MOVE GET ID CONSTRUCTOR AND FIND ALL INPUTS && OUTPUTS
@@ -464,9 +479,7 @@ onUnmounted(() => {
         isClicked: false
     }) as ConstructorPositionType
     
-    ( controlMap.value as ManageConstructorMap).reset();
-    ( controlConstructor.value as ManageCardConstructor ).reset();
-    ( controlLink.value as ManageLinks ).reset();
+    resetHandlers();
 });
 
 
@@ -499,29 +512,42 @@ onUnmounted(() => {
 M${this.#outputArrowPosition.x - this._chartFlowPosition.x - 110},${this.#outputArrowPosition.y - this._chartFlowPosition.y - 85} C${this.#outputArrowPosition.x - this._chartFlowPosition.x - 110},${this.#outputArrowPosition.y - this._chartFlowPosition.y + 100 - 85} ${this.#inputArrowPosition.x - this._chartFlowPosition.x - 110},${this.#inputArrowPosition.y - this._chartFlowPosition.y - 100 - 85} ${this.#inputArrowPosition.x - this._chartFlowPosition.x - 110},${this.#inputArrowPosition.y - this._chartFlowPosition.y - 85}
 */
 
-function attachComputedRectPosition(option){
+function attachComputedRectPosition(option) {
 
     const dotOutput = document.getElementById(`constructor__output-${option.id}`)?.getBoundingClientRect() as DOMRect;
+    option = (rootFlowChart.value as HTMLDivElement)?.getBoundingClientRect() || {
+        x: 0,
+        y: 0
+    };
 
     return {
-        x: dotOutput.x - chartFlowPosition.x - 110 - 10,
-        y: dotOutput.y - chartFlowPosition.y - 85 - 10 + 9
+        x: dotOutput.x - chartFlowPosition.x - option.x - 10,
+        y: dotOutput.y - chartFlowPosition.y - option.y - 10 + 9
     }
 }
+
 function attachComputedPolygonPosition (option) {
 
     const dotOutput = document.getElementById(`constructor__output-${option.id}`)?.getBoundingClientRect() as DOMRect;
+    option = (rootFlowChart.value as HTMLDivElement)?.getBoundingClientRect() || {
+        x: 0,
+        y: 0
+    };
     
-    return `${dotOutput.x - chartFlowPosition.x - 110 - 10},${dotOutput.y - chartFlowPosition.y - 85 - 10} ${dotOutput.x - chartFlowPosition.x - 110},${dotOutput.y - chartFlowPosition.y - 85 - 10} ${dotOutput.x - chartFlowPosition.x - 110 - 10},${dotOutput.y - chartFlowPosition.y - 85 - 10 + 20}`;
+    return `${dotOutput.x - chartFlowPosition.x - option.x - 10},${dotOutput.y - chartFlowPosition.y - option.y - 10} ${dotOutput.x - chartFlowPosition.x - option.x},${dotOutput.y - chartFlowPosition.y - option.y - 10} ${dotOutput.x - chartFlowPosition.x - option.x - 10},${dotOutput.y - chartFlowPosition.y - option.y - 10 + 20}`;
     
 }
 
-function attachComputedPathPosition(option) {
+function attachComputedPathPosition( option ) {
 
     const dotOutput = document.getElementById(`constructor__output-${option.id}`)?.getBoundingClientRect() as DOMRect;
     const dotInput = document.getElementById(`constructor__input-${option.next_message}`)?.getBoundingClientRect() as DOMRect;
+    option = (rootFlowChart.value as HTMLDivElement)?.getBoundingClientRect() || {
+        x: 0,
+        y: 0
+    };
     
-    return `M${dotOutput.x - chartFlowPosition.x - 110},${dotOutput.y - chartFlowPosition.y - 85} C${dotOutput.x - chartFlowPosition.x - 110},${dotOutput.y - chartFlowPosition.y + 100 - 85} ${dotInput.x - chartFlowPosition.x - 110},${dotInput.y - chartFlowPosition.y - 100 - 85} ${dotInput.x - chartFlowPosition.x - 110},${dotInput.y - chartFlowPosition.x - 85}`;
+    return `M${dotOutput.x - chartFlowPosition.x - option.x},${dotOutput.y - chartFlowPosition.y - option.y} C${dotOutput.x - chartFlowPosition.x - option.x},${dotOutput.y - chartFlowPosition.y + 100 - option.y} ${dotInput.x - chartFlowPosition.x - option.x},${dotInput.y - chartFlowPosition.y - 100 - option.y} ${dotInput.x - chartFlowPosition.x - option.x},${dotInput.y - chartFlowPosition.x - option.y}`;
 
 }
 
@@ -547,6 +573,12 @@ function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp 
     store.dispatch(REDUCERS.MESSAGES + ActionTypes.FIND_CURRENT_CONSTRUCTOR, selectedConstructor);
 }
 
+function resetHandlers () {
+    ( controlMap.value as ManageConstructorMap).reset();
+    ( controlConstructor.value as ManageCardConstructor ).reset();
+    ( controlLink.value as ManageLinks ).reset();
+}
+
 
 
 </script>
@@ -563,7 +595,8 @@ function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp 
         background: rgba(0,0,0,0.1);
     }
     @include b(scrollable-area){
-        background: repeating-linear-gradient(45deg,#eee,#eee 10px,#e5e5e5 10px,#e5e5e5 20px);
+        background: var(--grid-bg);
+        background-size: 128px 128px;
         padding: 10px;
         position: relative;
         transition: all 90ms ease-in-out 45ms;
@@ -575,7 +608,7 @@ function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp 
     @include b(flowchart-container){
         position: relative;
         backface-visibility: initial !important;
-        background-color: #eaf9f9;
+        background-color: var(--flowchart-map-bg);
     }
     @include b(flowchart){
         height: 6000px;
@@ -583,7 +616,6 @@ function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp 
         cursor: all-scroll !important;
         opacity: 1;
         overflow: hidden;
-
         
         transform: matrix(1, 0, 0, 1, 0, 0);
         transform-origin: 50% 50%;
@@ -601,15 +633,17 @@ function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp 
     @include b(flowchart-operator){
         position: absolute;
         z-index: 1;
-        width: 240px;
-        padding: 4px;
+        width: 250px;
+        padding: 15px 7px;
         background-color: rgba(255,255,255,.88);
         border: 1px solid #fff;
         box-shadow: 0 2px 6px #00000026;
         pointer-events: initial;
-        border-radius: 4px;
         text-align: center;
         margin-bottom: 50px;
+
+        background: var(--message-body);
+        border-radius: 22px;
 
         & > * {
             pointer-events: none;
@@ -623,19 +657,24 @@ function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp 
     }
     @include b(op-message){
         & .flowchart-operator-title {
-            color: #00a851;
+            color: var(--clear-white-text);
         }
     }
 
     @include b(flowchart-operator-title){
+        
         padding: 2px 5px;
         font-weight: 700;
-        background-color: #e5fff2;
+        //background-color: #e5fff2;
         border-radius: 2px;
         cursor: move;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
+
+        font-weight: 400;
+        font-size: 18px;
+        line-height: 22px;
     }
     @include b(flowchart-operator-body){
             display: flex;
@@ -653,10 +692,10 @@ function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp 
     @include b(flowchart-operator-inputs){
          pointer-events: auto;
          & .flowchart-operator-connector-small-arrow {
-            top: -9px;
+            top: -21px;
          }
          & .flowchart-operator-connector-arrow {
-            top: -9px;
+            top: -21px;
         }
     }
     @include b(flowchart-operator-outputs){
@@ -674,7 +713,7 @@ function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp 
         position: absolute;
         width: 180px;
         height: 30px;
-        top: -15px;
+        top: -20px;
         color: transparent;
         opacity: 0;
     }
@@ -685,7 +724,7 @@ function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp 
         position: absolute;
         z-index: 3;
         .flowchart-operator-inputs & {
-            top: -9px;
+            top: -21px;
         }
     }
     @include b(flowchart-operator-connector-set){
@@ -697,10 +736,12 @@ function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp 
         padding-top: 1px;
         padding-bottom: 1px;
         margin-left: -4px;
+
+        pointer-events: auto;               // FIX
         
         &:hover .flowchart-operator-connector-small-arrow {
             transform: scale(1.2);
-            background: #007D96;
+            background: var(--connector-dot);
             transition: all 30ms ease-in-out 15ms;
         }
     }
@@ -708,8 +749,8 @@ function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp 
         width: 12px;
         height: 12px;
         position: absolute;
-        left: calc(50% - 6px);
-        background: #009FC1;
+        left: calc(50% - 10px);
+        background: var(--connector-dot);
         border-radius: 50%;
         box-shadow: 0 0 0 3px #fff, 0 0 0 4px #fff, 0 5px 6px #00000080;
         z-index: 3;
@@ -737,7 +778,7 @@ function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp 
         margin: 2px 0;
         color: #333;
         word-break: break-word;
-        background-color: rgba(0,0,0,.04);
+        background-color: var(--option-bg);
         font-size: 13px;
         &-content {
             word-break: break-word;
@@ -750,36 +791,39 @@ function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp 
     }
     
     .element-btn-wrap{
-        overflow: hidden;
 
     }
-    .element-btn{
-        pointer-events: auto;
-
+    .element-btn{        
+        display: grid;    
         position: relative;
         margin: 4px 0;
-        padding-right: 38px;
+        padding: 9px 18px;
         background-color: #fff;
         border-radius: 10px;
         background-color: #fbfbfb;
-        height: 30px;
         width: 100%;
-        line-height: 30px;
-        color: #000;
-        font-weight: 500;
         text-align: center;
         white-space: nowrap;
         text-overflow: ellipsis;
-        overflow: hidden;
         text-decoration: none;
-        font-size: 13px;
         margin-bottom: 8px;
         box-shadow: inset 0 0 0 1px rgb(51 51 51 / 10%);
         border: 0;
+
+        font-weight: 400;
+        font-size: 18px;
+        line-height: 22px;
+        color: #FFFFFF;
+
+        pointer-events: none;                       // FIX
+
+        & span {
+            justify-self: center;
+        }
         & .flowchart-operator-connector {
             width: 18px;
-            top: 6px;
-            right: 5px;
+            top: 12px;
+            right: -23px;
         }
         & .flowchart-operator-connector-label {
             width: 100%;
@@ -788,6 +832,13 @@ function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp 
 
         }
     }
-   
+
+   .flowchart-temporary-link-layer {
+       position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+   }
 
 </style>

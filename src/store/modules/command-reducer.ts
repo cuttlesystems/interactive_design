@@ -109,11 +109,11 @@ const actions = {
 
     },
 
-    async [ActionTypes.GET_LIST_COMMAND](context) {
+    async [ActionTypes.GET_LIST_COMMAND](context, botId) {
 
         try {
 
-            const res = await commandAPI.getCommands(context.rootState.botsReducer.currentBot.id)
+            const res = await commandAPI.getCommands(context.rootState.botsReducer.currentBot.id || botId)
 
             if(res.status === 200) {
                 context.commit( MutationTypes.SET_COMMAND_LIST, res.data )

@@ -1,11 +1,22 @@
 <template>
     <nav :class="[isBlockSideBar && 'block-sidebar','toolbar','constructor-container__item']">
+
+        <div class="main-sidebar__top">
+            <SvgIcon nameId="only-icon" />
+        </div>
+
         <ul class="structure-elements scrollable">
-            <li class="structure-elements__item" v-for="( item ) of rawData" :key="item.name" @click="selectConstructor($event, item)" :data-name="item.name">
+            <li class="structure-elements__item" v-for="( item ) of rawData" :key="item.name" @click="selectConstructor($event, item)"  :data-name="item.name"
+            tabindex="0"
+            >
                 <SvgIcon :nameId="item.src" alt="Icon" class="structure-elements__icon" />
                 <span class="element__title strip-text">{{ item.name }}</span>
+                <p class="tooltiptext">
+                    {{__('Создать бота')}}
+                </p>
             </li>
         </ul>
+
     </nav>
 </template>
 
@@ -20,7 +31,7 @@ import store from "~/store";
 const rawData = [
     {
         name: '',
-        src: 'email',
+        src: 'bot-create',
     },
     
 ]
@@ -59,9 +70,10 @@ export default defineComponent({
         vertical-align: middle;
     }
     @include b(structure-elements){
-        padding: 12px;
+
         @include e(item){
             margin-bottom: 12px;
+            position: relative;
 
             text-align: center;
             font-size: 12px;
@@ -70,7 +82,6 @@ export default defineComponent({
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
-            background-color: #fff;
             border-radius: 6px;
             border: none;
             box-shadow: 0 1px 2px #00000008;
@@ -78,20 +89,61 @@ export default defineComponent({
             color: #5c6a70;
             padding: 12px;
             line-height: 1.1;
+
             & * {
                 pointer-events: none;
             }
+
             &:active {
-                opacity: 0.5;
-                margin-bottom: 15px;
+                background-color: rgba(255,255,255, 0.1);
             }
+
+            &:hover .tooltiptext {
+                visibility: visible;
+            }
+            & .tooltiptext {
+                visibility: hidden;
+                width: 120px;
+                background-color: var(--clear-white);
+                color: var(--tooltip-text);
+                text-align: center;
+                border-radius: 6px;
+                padding: 4px 12px;
+                position: absolute;
+                z-index: 55;
+                top: 8px;
+                left: 90%;
+                font-weight: 400;
+                font-size: 17px;
+                line-height: 24px;
+            }
+            & .tooltiptext::after {
+                content: "";
+                position: absolute;
+                top: 50%;
+                right: 100%;
+                margin-top: -5px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: transparent var(--clear-white) transparent transparent;
+            }
+            
+
         }
+
         @include e(icon){
             display: block;
             margin: 2px auto 6px;
             width: 45px;
-            height: 32px;
+            height: 45px;
         }
+
+    }
+
+    .icon__only-icon {
+        display: block;
+        width: 43px;
+        height: 43px;
     }
 
 </style>

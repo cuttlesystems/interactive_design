@@ -1,25 +1,29 @@
 <template>
 
-    <EditorNavbar />
-
     <div class="constructor-container">
 
         <TheSidebar class="fixed__config-editor" 
             @getSelectedConstructor="getSelectedConstructor" 
-        />
+        />   
 
-        <main 
-            :class="{
-                'edit-constructor': route.name === 'chart',
-            }"
-            class="flowchart-column constructor-container__item">
+        <div class="constructor-container">
+            
+            <EditorNavbar />
 
-            <slot :selectedConstructor="selectedConstructor" 
-                :isMoved="isMoved"
-                :mousePosition="mousePosition"
-                />
+            <main 
+                :class="{
+                    'edit-constructor': route.name === 'chart',
+                }"
+                class="flowchart-column constructor-container__item">
 
-        </main>
+                <slot :selectedConstructor="selectedConstructor" 
+                    :isMoved="isMoved"
+                    :mousePosition="mousePosition"
+                    />
+
+            </main>
+
+        </div>
 
     </div>
     
@@ -133,17 +137,17 @@ useEventListener({ target: window, event: 'mouseup', cb: mouseUpHandler })
 @include b(flowchart-column){
     position: relative;
     width: calc(100vw - 65px);
+    background: var(--flowchart-bg);
 }
 
 .edit-constructor {
     width: calc(100vw - 100px);
-    display: table-cell;
 }
 
 .fixed__config-editor {
     height: calc(100vh - 75px);
     display: table-cell;
-
+    background: var(--sidebar-bg);
 }
 
 
