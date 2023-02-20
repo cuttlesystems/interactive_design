@@ -31,7 +31,8 @@ const state = (): BotsState => ({
 }) 
 
 const getters = {
-    getCurrentBotId: (state,getters) => state.currentBot.id
+    getCurrentBotId: (state,getters) => state.currentBot.id,
+    findDeletedBot: (state, getters) => (deletedBotId) => state.bots.findIndex((bot) =>  bot.id == deletedBotId)
 }
 
 const mutations = {
@@ -43,6 +44,16 @@ const mutations = {
     [MutationTypes.SET_BOT_START_MESSAGE](state, start_message){
         state.currentBot.start_message = start_message;
     },
+
+    [MutationTypes.APPEND_CREATED_BOT](state, newBotCred) {
+        state.bots.push(newBotCred)
+    },
+
+    [MutationTypes.REMOVE_BOT_FROM_LIST](state, botId) {
+        const foundIndex = state.bots.findIndex((activeBotId) => botId == activeBotId)
+        state.bots.splice(foundIndex, 1)
+    },
+    
 
     [MutationTypes.SET_CURRENT_BOT](state, bot) {
         state.currentBot = bot
@@ -94,8 +105,20 @@ const actions = {
         return res
     },
 
-    [ActionTypes.CREATE_BOT](context ,botCredentials){
-        return Promise.resolve(botAPI.createBot(botCredentials))
+    async [ActionTypes.CREATE_BOT](context ,botCredentials){
+        let res
+
+        try {
+
+            res = await botAPI.createBot(botCredentials);
+            
+            context.commit(MutationTypes.APPEND_CREATED_BOT, res.data)
+
+        } catch(err) {
+
+
+        }
+
     },
 
     async [ActionTypes.GENERATE_BOT_FILES](context, botId){
@@ -137,6 +160,28 @@ const actions = {
 
         } catch(err) {
             throw err;
+        }
+
+    },
+
+    async [ActionTypes.DELETE_BOT]( { commit, getters, state } , botId) {
+
+        let res, foundDeletedBotIdx, foundBot;
+
+        try {
+            foundDeletedBotIdx = getters['findDeletedBot'](botId);
+
+            foundBot = state.bots[foundDeletedBotIdx - 1];
+            res = await botAPI.deteleBot(botId);
+            commit(MutationTypes.REMOVE_BOT_FROM_LIST, botId);
+
+            return {
+                foundBot,
+                res
+            }
+
+        } catch(err) {
+            
         }
 
     }

@@ -12,7 +12,7 @@
                 <SvgIcon :nameId="item.src" alt="Icon" class="structure-elements__icon" />
                 <span class="element__title strip-text">{{ item.name }}</span>
                 <p class="tooltiptext">
-                    {{__('Создать бота')}}
+                    {{__('Создать сообщение')}}
                 </p>
             </li>
         </ul>

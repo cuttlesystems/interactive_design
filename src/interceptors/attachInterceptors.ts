@@ -5,8 +5,6 @@ import {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse} from "axio
 
 export default ( [withToken, withOutToken], store ) => {   // initial req done()
 
-    
-    
     const ejectInstanceAxiosRequest: Array<number> = [];
     const ejectInstanceAxiosResponce: Array<number> = [];
 
@@ -22,7 +20,7 @@ export default ( [withToken, withOutToken], store ) => {   // initial req done()
 
     router.afterEach((to, from) => {
 
-        if( [ 'login', 'registration', 'main', 'entry' ].includes(to.name as string) ){
+        if( [ 'login', 'registration', 'main', 'entry', 'create-bot' ].includes(to.name as string) ){
 
             nprogress.done();
 
@@ -48,18 +46,24 @@ export default ( [withToken, withOutToken], store ) => {   // initial req done()
 
             return config
         }, (err: AxiosError): Promise<AxiosError> => {
-
+            
             return Promise.reject(err)
 
         }))
 
         ejectInstanceAxiosResponce.push(instance.interceptors.response.use((res: AxiosResponse): AxiosResponse => {
-
+            
             nprogress.done();
 
             return res
         }, (err: AxiosError): Promise<AxiosError> => {
 
+            if((err.toJSON() as AxiosError).message === "Network Error") {
+                router.push({
+                    name: 'error-page'
+                })
+            }
+                
             return Promise.reject(err)
 
         }))

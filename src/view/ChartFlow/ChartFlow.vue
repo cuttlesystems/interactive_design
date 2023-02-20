@@ -65,17 +65,21 @@
                             </ul>
 
                         </div>
+                        
                     </div>
 
-                    <!-- <div class="flowchart-operator-outputs">
+                    <div class="flowchart-operator-outputs">
                         <div class="flowchart-operator-connector-set">
                             <div class="flowchart-operator-connector">
                                 <div class="flowchart-operator-connector-label"></div>
                                 <div class="flowchart-operator-connector-arrow"></div>
-                                <div class="flowchart-operator-connector-small-arrow"></div>
+                                <div 
+                                    :id="`m_${item.id}`"
+                                    :data-optionid="`m_${item.id}`"
+                                    class="flowchart-operator-connector-small-arrow"></div>
                             </div>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
                 
                 <!-- <div class="flowchart-operator operator-trigger op-error">
@@ -432,6 +436,9 @@ onMounted(() => {
         })
         ).flat(3)
     });
+
+    //          TEST next_message not in with_variants api
+    store.dispatch('messagesReducer/' + ActionTypes.SET_TEST_CONSTRUCTOR_LIST, route.query.id || route.query.botId )
     
     // alert('WHEN MOVE GET ID CONSTRUCTOR AND FIND ALL INPUTS && OUTPUTS ------- INITIAL CREATE NOT ALLOWED DELETE OPTIONS')
     // alert('WHEN DELETE CONSTRUCTOR REMOVE ALL LINKS && OPTION WHEN ATTACHED TWO CONSTRUCTOR SIDE EFFECT')
@@ -452,9 +459,19 @@ onMounted(() => {
     // alert( `TOKEN VALID && START MESSAGE MUST BE TAKEN && REGISTER VALIDATION && NGINX && PHOTO && ERROR MESSAGE TYPE && 403
     //     && COMMAND && CHECK ALL HANDLER && POLYGON && BLOCK MAIN PAGE MODAL && MESSAGE NOT TOCHABLE FIELD -> PROD
     // ` )
-    // alert( 'COLOR && FIX UNSELECTABLE AREA' )
+    // alert( 'COLOR && FIX UNSELECTABLE AREA && SVG PATH' )
     
-    // alert ( ' TOP EDGE ARROW ' )
+    // alert ( ' ERROR MESSAGE && NEW TYPE OF MESSAGE ' )
+    // alert ( ' message output save as optionid and when link created sets optionid == (messageid) and when move it takes unqie optionid ' )
+    // alert ( ' off loader chartflow page && duplicated post request' )
+
+    // alert ( ' NOT ALLOW RECONNECT LINsK TO SAME MESSAGE && OUTPUT MANAGE CONSTRUCTOR ' )
+    // alert ( ' VARY VARIANTS OF MESSAGE TYPE not( variants || goto || anyinput ) ' )
+    // alert ( ' CREATE BOT PAGE && ADD FEAT CHANGE TOKEN BOT' )
+
+    // alert ( ' TYPE OF MESSAGES && ERROR MESSAGE && DELETE LINK FEAT && CHECK BOT CREATE PAGE ' )
+    // alert( ' UPDATE BOT FEAT && BOT DESCRIPTION -> BOT STRUCTURE ' )
+    // alert ( ' CHECK START BOT ' ) 
 
     sideBarRef.value = document.querySelector('.messenger-flowchart-sidebar');
     
@@ -574,7 +591,7 @@ function onConstructorSelectHandler(ev, selectedConstructor) {       // mouseUp 
 }
 
 function resetHandlers () {
-    ( controlMap.value as ManageConstructorMap).reset();
+    ( controlMap.value as ManageConstructorMap ).reset();
     ( controlConstructor.value as ManageCardConstructor ).reset();
     ( controlLink.value as ManageLinks ).reset();
 }

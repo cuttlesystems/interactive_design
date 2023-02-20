@@ -1,6 +1,9 @@
 <template>
-    <div class="create-bot">
-        <div class="create-bot__inner">
+    <div class="create-bot bot-page">
+        <div class="create-bot__inner bot-page__inner content-area">
+            <h1 class="create-bot__title">
+                {{__("Создать бота")}}
+            </h1>
             <Input 
                 :label="__('Имя Бота')"
                 :value="unref(formData.name)"
@@ -28,15 +31,47 @@
     @include b(create-bot){
 
         @include e(inner){
+            width: 100%;
+
             display: flex;
             flex-direction: column;
-            gap: 25px;
-            
+
+            gap: 30px;
+        }
+
+        @include e(title) {
+            font-weight: 500;
+            font-size: 30px;
+            line-height: 38px;
+
+            color: var(--clear-white-text);
         }
 
         @include e(btn){
             align-self: center;
             width: 70%;
+        }
+        
+        & .custom-input__label {
+            font-weight: 400;
+            font-size: 18px;
+            line-height: 23px;
+        }
+
+        & .custom-input__label {
+            margin-left: 0;
+        }
+
+        & .create-bot__btn {
+            width: 100%;
+            font-weight: 500;
+            font-size: 15px;
+            line-height: 23px;
+            padding: 13px 0;
+        }
+
+        & .bot-page__inner {
+            height: auto;
         }
 
     }
@@ -78,7 +113,7 @@ async function completeFormData() {
                     group: 'app',
                     type: 'success',
                     title: '123',
-                    text: 'dsaqwe'
+                    text: 'Бот успешно создан'
                 })
             }
             

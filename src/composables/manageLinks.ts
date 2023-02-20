@@ -69,6 +69,7 @@ class ManageLinks implements IManageLinks{
     }
 
     onMouseDownHandler(ev) {
+        
         this.#arrowOutput = ev.target.nextElementSibling;
         // line svg
         console.log(this.strightLine)
@@ -106,26 +107,31 @@ class ManageLinks implements IManageLinks{
         const arrowInput = ev.target.nextElementSibling;        // get input dot position
 
         const isInput = ev.composedPath().find((el) => el?.classList?.contains('flowchart-operator-inputs'));
-
+        
         if( ev.target.classList.contains('flowchart-operator-connector-arrow') 
             && this.#isCreateLink 
             && this.parentOutputConstructor?.dataset.constructorid !== arrowInput.dataset.constructorid 
             && isInput
             ){
-                console.log(' CONNECTION LINKED FIRED  ')
-            this.store.dispatch( 'messagesReducer/' + ActionTypes.UPDATE_OPTION, {
+                
+            this.store.dispatch( 'messagesReducer/' + (this.#arrowOutput.dataset.optionid?.includes('m') ? ActionTypes.MESSAGE_TO_MESSAGE : ActionTypes.UPDATE_OPTION), {
                 optionId: this.#arrowOutput.dataset.optionid,
                 constructorId: arrowInput.dataset.constructorid,
             } ).then((res) => {
                 
                 if(res.status === 200) {
-
-                    this.store.commit('messagesReducer/' + MutationTypes.CHANGE_CURRENT_LINK, res.data);    // remove prev link
-
+                    
+                    this.store.commit('messagesReducer/' + MutationTypes.CHANGE_CURRENT_LINK, {
+                        updatedMessageOrVariant: res.data,
+                        isMessage: this.#arrowOutput.dataset.optionid?.includes('m')
+                    });    // remove prev link
+                    
                     this.#isCreateLink = false;
                     
                     this.#inputArrowPosition = arrowInput.getBoundingClientRect();
-        
+
+                    // m_messageId || optionId
+
                     const path = `<g>
                         <mask id="fc_mask_${this.#arrowOutput.dataset.optionid}">
                             <rect x="0" y="0" width="100%" height="100%" stroke="none" fill="white" />

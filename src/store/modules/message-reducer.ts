@@ -26,6 +26,8 @@ export interface MessageType {
     next_variants?: Array<OptionType>;
     
     tempName?: string;
+
+    [Symbol.iterator]();
 }
 export enum INITIAL_VALUE {
     TEMP_NAME_CONSTRUCTOR = 'Введите название'
@@ -47,6 +49,9 @@ type OptionType = {
 }
 export interface MessageState {
     constructorList: Array<MessageType>;
+
+    testConstructorList: Array<MessageType>;
+
     optionListAll: Array<OptionType>;
 
     currentMessage: MessageType | null;
@@ -54,6 +59,7 @@ export interface MessageState {
     optionsListTemp: Array<OptionType>;
     isBlockSideBar: boolean;
     EDIT_CONSTRUCTOR_FORM: boolean;
+
 }
 
 function getDefaultState () {
@@ -74,6 +80,9 @@ function getDefaultState () {
 
 const state = (): MessageState => ({
     constructorList: [],
+
+    testConstructorList: [],
+
     optionListAll: [],
 
     currentMessage: null,       // USED WHEN:  EDIT && DELETE && UPDATE -> CLICK
@@ -87,7 +96,8 @@ const state = (): MessageState => ({
 
 const getters = {
     getCurrentMessage: (state,getters) => state.currentMessage,
-    findCurrentMessage: (state, getters) => (messageId) => state.constructorList.find((constructor) => constructor.id == messageId)
+    findCurrentMessage: (state, getters) => (messageId) => state.constructorList.find((constructor) => constructor.id == messageId),
+    findRelativeMessagesById: (state, getters) => (selectedMessageId) => state.testConstructorList.filter((message) => selectedMessageId === message.next_message)
 }
 
 const mutations = {
@@ -103,6 +113,19 @@ const mutations = {
     [MutationTypes.SET_INITIAL_CONSTRUCTOR_LIST](state, constructorData){
         state.constructorList = constructorData
     },
+    [MutationTypes.SET_TEST_CONSTRUCTOR_LIST](state, constructorData){
+        state.testConstructorList = constructorData
+    },
+    [MutationTypes.APPEND_TEST_CONSTRUCTOR_LIST](state, constructorData){
+        state.testConstructorList.forEach(tempMessage => {
+            if(tempMessage.id === constructorData.id) {
+                Object.assign(tempMessage, constructorData)
+            }
+            return tempMessage
+        })
+    },
+
+
     [MutationTypes.EDIT_CONSTRUCTOR_LIST](state, constructorData){
         state.constructorList.push(constructorData)
     },
@@ -235,12 +258,12 @@ const mutations = {
     },
 
     [MutationTypes.CHANGE_CURRENT_LINK](state, optionCred){     // CHECK DUPILICATED NEXT VARIANTS WHEN RECREATED
-        
-        state.constructorList.forEach((constructor) => {
 
-            if( constructor.id != optionCred.current_message && constructor.id != optionCred.next_message ){
+        if( !optionCred.isMessage ) state.constructorList.forEach((constructor) => {
+
+            if( constructor.id != optionCred.updatedMessageOrVariant.current_message && constructor.id != optionCred.updatedMessageOrVariant.next_message ){
                 
-                const foundIdxOption = constructor.next_variants.findIndex((option) => option.id == optionCred.id)
+                const foundIdxOption = constructor.next_variants.findIndex((option) => option.id == optionCred.updatedMessageOrVariant.id)
 
                 if(foundIdxOption !== -1) {
                     constructor.next_variants.splice(foundIdxOption, 1)
@@ -251,10 +274,10 @@ const mutations = {
             return constructor
         })
         
-        const pathEl = document.querySelector(`#fc_path_${optionCred.id}_g`)
+        const pathEl = document.querySelector(`#fc_path_${optionCred.isMessage ? ('m_' + optionCred.updatedMessageOrVariant.id) : optionCred.updatedMessageOrVariant.id}_g`)
+
         if( pathEl ) {
             pathEl.parentElement?.remove();
-            
         }
 
 
@@ -288,6 +311,27 @@ const actions = {
             return Promise.reject(err)
         }
         
+    },
+
+    async [ActionTypes.SET_TEST_CONSTRUCTOR_LIST](context, botID) {
+
+        const res = await messagesAPI.getTestMessages(botID)
+        context.commit(MutationTypes.SET_TEST_CONSTRUCTOR_LIST, res.data)
+        return res
+
+    },
+    async [ActionTypes.MESSAGE_TO_MESSAGE](context, message) {
+
+        const res = await messagesAPI.updateMessage(message.optionId.replace(/m_/, ''), {
+            next_message: message.constructorId
+        }, false);
+        
+        if(res.status === 200) {
+            context.commit(MutationTypes.APPEND_TEST_CONSTRUCTOR_LIST, res.data)
+        }
+
+        return res
+
     },
 
     async [ActionTypes.CREATE_MESSAGE](context , { botID, messageCred }){

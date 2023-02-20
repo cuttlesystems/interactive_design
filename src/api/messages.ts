@@ -12,6 +12,11 @@ const messagesAPI = {
     getMessages(botId){
         return withToken.get(`bots/${botId}/messages?with_variants=1`)
     },
+
+    getTestMessages(botId) {
+        return withToken.get(`bots/${botId}/messages/`)
+    },
+
     updateMessage(messageId, newMessageWithPosition, isFormData ){
         return withToken.patch(`message/${messageId}/`, newMessageWithPosition, {
             headers: {

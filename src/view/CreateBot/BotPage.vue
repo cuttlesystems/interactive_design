@@ -3,13 +3,24 @@
         <div class="bot-page__inner">
 
             <div class="bot-page__top">
+
                 <div class="bot-page__title-field">
                     <SvgIcon nameId="bot-icon" />
                     <span>{{currentBot.name}}</span>
                 </div>
+
+                
+
                 <p class="bot-page__inform">
                     {{isActiveBot ? __('Бот активен') : __('Бот не активен')}}
                 </p>
+
+                <label class="switch-gray">
+                    <input :checked="isActiveBot" type="checkbox" @click="botToggler"/>
+                    <span class="slider"></span>
+                </label>
+
+                
             </div>
 
             <div class="bot-page__content-area">
@@ -28,17 +39,20 @@
                         <SvgIcon nameId="plus" />
                         {{__('Создать Бота')}}
                     </button> -->
-                    <div>
-                        <button class="blue__btn" @click="startBotHandler">
-                            <!-- <SvgIcon nameId="plus" /> -->
+                  
+                    <p class="bot-page__inform bot-page__trash" @click="deleteBotHandler">
+                        <SvgIcon nameId='trash' />
+                        <span>{{__('Удалить бота')}}</span>
+                    </p>
+                        <!-- <button class="blue__btn" @click="startBotHandler">
+                           
                             {{__('ЗАПУСТИТЬ Бота')}}
                         </button>
         
                         <button class="blue__btn" @click="stopBotHandler">
-                            <!-- <SvgIcon nameId="plus" /> -->
+                           
                             {{__('ОСТАНОВИТЬ Бота')}}
-                        </button>
-                    </div>
+                        </button> -->
 
                 </div>
 
@@ -50,7 +64,7 @@
 
 <script setup lang="ts">
 import { notify } from "@kyvg/vue3-notification";
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { onBeforeRouteUpdate, useRoute, useRouter } from "vue-router";
 import { SvgIcon } from "~/components";
 import { useStore } from "~/store";
@@ -60,12 +74,16 @@ import { ChartFlow } from "../ChartFlow";
 
 const currentBotId =  computed(() => store.getters['botsReducer/getCurrentBotId'])
 const isActiveBot = computed(() => store.state.botsReducer.activeBots.includes(currentBotId.value))
+
+
 //                  HOOKS
 const store = useStore()
 const route = useRoute()
 const router = useRouter();
+
 //                  STATE
 const currentBot = computed(() => store.state.botsReducer.currentBot)
+
 
 //                  LIFECYCLE
 onMounted(initialize);
@@ -81,6 +99,26 @@ function initialize() {
 
     store.dispatch( 'botsReducer/' + ActionTypes.GET_ACTIVE_BOTS )
     
+}
+
+function deleteBotHandler() {
+    
+    store.dispatch( 'botsReducer/' + ActionTypes.DELETE_BOT, route.query.botId ).then((context) => {
+
+        if( context.res.status === 204 ) {
+            
+            router.push( {
+                name: 'bot',
+                query: {
+                    botId: context.foundBot.id
+                }
+            })
+
+        }
+
+    })
+
+
 }
 
 function structureBotHandler(){
@@ -106,30 +144,55 @@ function structureBotHandler(){
     
 }
 
-const startBotHandler = () => {
-
+const botToggler = ({target}) => {
+    
     if(currentBotId.value){
-        
-        store.dispatch('botsReducer/' + ActionTypes.BOT_TOGGLER, {
-            botId: currentBotId.value,
-            type: 'start'
-        }).then(() => {
 
-            notify({
-                group: 'app',
-                type: 'success',
-                title: 'Бот успешно запущено',
+        if(target.checked === true) {
+            
+            store.dispatch('botsReducer/' + ActionTypes.BOT_TOGGLER, {
+                botId: currentBotId.value,
+                type: 'start'
+            }).then(() => {
+
+                notify({
+                    group: 'app',
+                    type: 'success',
+                    title: 'Бот успешно запущено',
+                })
+
+            }).catch(() => {
+
+                notify({
+                    group: 'app',
+                    type: 'error',
+                    title: 'Ошибка',
+                })
+
+            })
+            
+        } else {
+
+            store.dispatch('botsReducer/' + ActionTypes.BOT_TOGGLER, {
+                botId: currentBotId.value,
+                type: 'stop'
+            }).then(() => {
+                // debugger
+                notify({
+                    group: 'app',
+                    type: 'success',
+                    title: 'Бот успешно остановлен',
+                })
+
+            }).catch(() => {
+                notify({
+                    group: 'app',
+                    type: 'error',
+                    title: 'Ошибка',
+                })
             })
 
-        }).catch(() => {
-
-            notify({
-                group: 'app',
-                type: 'error',
-                title: 'Ошибка',
-            })
-
-        })
+        }
 
     } else {
         
@@ -141,45 +204,8 @@ const startBotHandler = () => {
 
     }
 
-    
-
 }
 
-const stopBotHandler = () => {
-
-    if(currentBotId.value){
-
-        store.dispatch('botsReducer/' + ActionTypes.BOT_TOGGLER, {
-            botId: currentBotId.value,
-            type: 'stop'
-        }).then(() => {
-            // debugger
-            notify({
-                group: 'app',
-                type: 'success',
-                title: 'Бот успешно остановлен',
-            })
-
-        }).catch(() => {
-            notify({
-                group: 'app',
-                type: 'error',
-                title: 'Ошибка',
-            })
-        })
-
-    } else {
-
-        notify({
-            group: 'app',
-            type: 'error',
-            title: 'Выберите бота',
-        })
-
-    }
-
-    
-}
 
 </script>
 
@@ -208,6 +234,16 @@ const stopBotHandler = () => {
             align-items: center;
         }
 
+        @include e(trash) {
+            margin-top: 5px;
+            cursor: pointer;
+            & span {
+                margin-left: 7px;
+                position: relative;
+                bottom: 4px;
+            }
+        }
+
         @include e(bottom) {
             margin: 50px 0 30px;
             & div {
@@ -217,7 +253,8 @@ const stopBotHandler = () => {
         }
 
         @include e(inform){
-            color: var(--active-info)
+            color: var(--active-info);
+            margin-left: 150px;
         }
 
         @include e(title-field) {
@@ -253,6 +290,15 @@ const stopBotHandler = () => {
             overflow: hidden;
             padding: 34px 60px;
 
+        }
+
+    }
+
+    @include b(icon) {
+
+        @include e(trash) {
+            width: 24px;
+            height: 24px;
         }
 
     }

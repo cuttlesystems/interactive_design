@@ -15,12 +15,18 @@
                 
                 <li class="main-sidebar__item" v-for="bot of bots" :key="bot.id">
                     <router-link 
+                        class="bot__link"
+                        @click="onLinkHandler"
                         :to="{
                             name: 'bot',
                             query: {
                                 botId: bot.id
                             }
-                    }">
+                        }"
+                        :style="{
+                            background: isActiveLink(bot) === 'active-page' ? 'rgba(255, 255, 255, 0.1)' : 'auto'
+                            }"
+                    >
                         <!-- <SvgIcon :nameId="route.name === 'main' ? 'home--blue': 'home'" /> -->
                         <img src="../../assets/img/bot-image.png" alt="Bot">
                         <span v-if="isExpandSideBar" class="main-sidebar__text">{{bot.name}}</span>
@@ -74,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUpdated, Ref, ref, watch } from "vue";
+import { computed, onMounted, onUpdated, Ref, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "~/store";
 import { ActionTypes } from "~/store/modules/action-types";
@@ -89,15 +95,18 @@ const router = useRouter()
 
 //              STATE
 const isExpandSideBar = ref(false)
-const allowedBurgerPages = ref(['create-bot'])
-const bots: Ref<Array<unknown>> = ref([])
+const allowedBurgerPages = ref([''])
+const bots: Ref<Array<unknown>> = computed({
+    get: () => store.state.botsReducer.bots,
+    set: (botList) => {
+        store.commit('botsReducer/' + MutationTypes.SET_BOTS_LIST, botList)
+    }
+})
 
 
 onMounted(() => {
 
     store.dispatch('botsReducer/' + ActionTypes.GET_BOTS_LIST).then((data) => {
-        
-        bots.value = data;
 
         if(data.length){
 
@@ -117,17 +126,27 @@ function iconHandler() {
 
 }
 
-function isActiveLink ( bot ) {
+function onLinkHandler () {
+    
+    document.querySelectorAll('.bot__link')!.forEach((elLink) => {
+        (elLink as HTMLLinkElement).style.setProperty('background', 'none');
+    });
+
+}
+
+function isActiveLink( bot ) {
+    
     return route.query?.botId == bot.id ? 'active-page' : 'inactive-page'
+    
 }
 
 function createBotHandler() {
 
-    store.commit(MutationTypes.SET_CURRENT_LAYOUT, 'EmptyLayout')
+    store.commit(MutationTypes.SET_CURRENT_LAYOUT, 'EmptyLayout');
 
     router.push({
         name: 'create-bot'
-    })
+    });
 
 }
 
@@ -218,9 +237,7 @@ function createBotHandler() {
 
                 color: inherit;
 
-                &:focus {
-                    background: rgba(255, 255, 255, 0.1);
-                }
+                
             }
             & span {
                 display: none;

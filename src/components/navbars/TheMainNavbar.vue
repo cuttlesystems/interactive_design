@@ -157,16 +157,22 @@ function toggleProfileHandler (ev) {
 function quitHandler(ev) {
 
     store.dispatch('authReducer/' + ActionTypes.LOGOUT).then((res) => {
-        router.push( { name: 'login' } );
-        storage.reset();
+        
         store.commit('authReducer/' + MutationTypes.SET_USER_CREDENTIALS, '');
+
     }).catch((err) => {
+        
         notify({
             group: 'app',
             type: 'error',
             title: 'Ошибка',
-        })
-        console.error(err)
+        });
+        
+    }).finally(() => {
+
+        storage.reset();
+        router.push( { name: 'login' } );
+    
     })
 
 }

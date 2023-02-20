@@ -122,7 +122,7 @@ class ManageCardConstructor implements IManageCardConstructor { // Playing insid
     }
 
     onMouseDown(ev: MouseEvent) {           // SETS TWO POINTS
-        
+        ev.stopPropagation();
         if((ev.target as HTMLDivElement).classList.contains('flowchart-operator')){ // OVER CONSTRUCTOR
 
             /*
@@ -363,19 +363,32 @@ class ManagePath {
 
     constructor( currentConstructor: MessageType, private readonly _constrolLinkLayer: SVGElement ){
         
+        let tempDotsInfo = currentConstructor?.next_variants?.concat(store.getters['messagesReducer/' + 'findRelativeMessagesById'](currentConstructor.id));
+        
         this.inputs = {
             currentConstructorInputPosition: (() => document.querySelector(`#constructor__input-${currentConstructor.id}`)?.getBoundingClientRect())(),
-            items: currentConstructor?.next_variants?.map((option) => {                    // INITIAL SINGLE DOT OF CONSTRUCTOR
-                    
-                    const pathEl = _constrolLinkLayer.querySelector(`#fc__path-${option.id}`);
+            items: tempDotsInfo!.map((option) => {                    // INITIAL SINGLE DOT OF CONSTRUCTOR
+
+                    let pathEl;    
+
+                    if(option.hasOwnProperty('variable')) {
+
+                        pathEl = _constrolLinkLayer.querySelector(`#fc__path-m_${option.id}`);
+                        
+                    } else{
+
+                        pathEl = _constrolLinkLayer.querySelector(`#fc__path-${option.id}`);          // FIRST OF ALL FIND PARTICULAR CONNECTION
+                        
+                    }
+
                     if(pathEl){
                         console.log(pathEl, 'PATH ELEMENT')
-                        const dAttrArr = (pathEl as SVGPathElement).getAttribute('d')?.split(' ') as Array<string>;
+                        const dAttrArr = (pathEl as SVGPathElement).getAttribute('d')?.split(' ') as Array<string>;         // GET PATH D ATTR *POSITION*
                         
                         return {
                             pathEl,
-                            staticDotsPosition: {
-                                x: parseFloat(dAttrArr[0].replace(/(^M|\,.*)/,'')),
+                            staticDotsPosition: {                                   //          FIND ORIGIN OF CONNECTION -> INPUT
+                                x: parseFloat(dAttrArr[0].replace(/(^M|\,.*)/,'')),         
                                 y: parseFloat(dAttrArr[0].replace(/^M.*\,/,'')),
                             }
                         }
@@ -385,12 +398,29 @@ class ManagePath {
                 })
 
         };
-
+        
+        
+        // _constrolLinkLayer.querySelector(`#fc__path-m_${currentConstructor.id}`) // relative to this constructor messages id
+        // @ts-ignore
+        tempDotsInfo = [ ...currentConstructor.current_variants, currentConstructor ];
+        
         this.outputs = {
 
-            items: currentConstructor?.current_variants?.map((option) => {
+            items: tempDotsInfo.map((option) => {
                 
-                    const pathEl = _constrolLinkLayer.querySelector(`#fc__path-${option.id}`);
+                    // const pathEl = _constrolLinkLayer.querySelector(`#fc__path-${option.id}`);
+
+                    let pathEl;    
+
+                    if(option.hasOwnProperty('variable')) {
+
+                        pathEl = _constrolLinkLayer.querySelector(`#fc__path-m_${option.id}`);
+                        
+                    } else{
+
+                        pathEl = _constrolLinkLayer.querySelector(`#fc__path-${option.id}`);          // FIRST OF ALL FIND PARTICULAR CONNECTION
+                        
+                    }
 
                     if(pathEl) {
 
@@ -413,6 +443,12 @@ class ManagePath {
 
         
     }
+
+    
+
+
+
+    
 
 }
 

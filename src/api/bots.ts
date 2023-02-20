@@ -16,6 +16,9 @@ export const botAPI = {
     updateBot(botId, botCred){
         return withToken.patch(`bots/${botId}/`, botCred)
     },
+    deteleBot(botId){
+        return withToken.delete(`bots/${botId}/`)
+    },
 
     generateBotCode(botId) {
         return withToken.post(`bots/${botId}/generate/`)
