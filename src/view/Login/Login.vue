@@ -35,7 +35,10 @@
 
                 <DarkSwitcher />
 
-                <input type="submit" class="form__btn" />
+                <button type="submit" class="form__btn">
+                    <span v-if="isLoaded">{{__('Отправить')}}</span>
+                    <div class="loader" v-else />
+                </button>
                 
             </form>
             

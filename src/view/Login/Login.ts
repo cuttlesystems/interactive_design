@@ -29,11 +29,13 @@ export default defineComponent<LoginState, LoginProps>({
         const router = useRouter()
         const route = useRoute()
         // console.log(context)
+        
 
         const state = reactive({
             username: '',
             password: ''
-        })
+        });
+        const isLoaded = ref(true)
 
         interface ErrorState {
             loginField: null | string
@@ -52,9 +54,11 @@ export default defineComponent<LoginState, LoginProps>({
 
         async function submitHandler() {
 
+
             const isValid = await v$.value.$validate()
 
             if (isValid) {
+                isLoaded.value = false;
                 store.dispatch('authReducer/' + ActionTypes.LOGIN, {
 
                     username: state.username,
@@ -63,16 +67,19 @@ export default defineComponent<LoginState, LoginProps>({
                 }).then((res) => {
 
                     if(res.status === 200) {
+                        
                         store.state.authReducer.authToken && router.push({ name: 'main' })
                     }
 
                 }).catch((err) => {
-
+                    
                     if (err.response.status === 400) {
                         errors.loginField = 'Не правильный логин или пароль'
                         
                     }
 
+                }).finally(() => {
+                    isLoaded.value = true;
                 })
             }
 
@@ -88,7 +95,8 @@ export default defineComponent<LoginState, LoginProps>({
             v$,
             state,
             submitHandler,
-            errors
+            errors,
+            isLoaded
         }
     },
 

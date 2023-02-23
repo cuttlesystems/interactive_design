@@ -1,7 +1,7 @@
 <template>
     <div class="login registration">
         <div class="login__inner">
-            <form @submit.prevent="submitHandler" class="form">
+            <form @submit.prevent="submitHandler" class="form" autocomplete="off">
                 <h1 class="form__title">Добро пожаловать <br />на БОТ-систему</h1>
                 
                 <div class="form__field-box">
@@ -49,11 +49,14 @@
                 <!-- <input type="password" name="password" class="form__input" placeholder="Введите пароль"
                     v-model="state.password" 
                     /> -->
-                <!-- <div class="form__input--error" v-if="v$.password.$dirty && v$.password.required.$invalid">{{ 'Поле не должно быть пустым' }}</div>
-                <div class="form__input--error" v-if="v$.password.$dirty && v$.password.firstCharacter.$invalid">{{ 'Ошибка валидации' }}</div>
-                <div class="form__input--error" v-if="errors.loginField">{{ errors.loginField }}</div> -->
+                <!-- <div class="form__input--error" v-if="v$.password.$dirty && v$.password.required.$invalid">{{ 'Поле не должно быть пустым' }}</div> -->
+                <div class="form__input--error error-match" v-if="v$.email.$invalid">{{ __("Введите валидный email") }}</div>
+                <div class="form__input--error error-match" v-if="v$.confirmPassword.$invalid">{{ __("Ошибка повторение пароля") }}</div>
                 <DarkSwitcher />
-                <input type="submit" class="form__btn" />
+                <button type="submit" class="form__btn">
+                    <span v-if="isLoaded">{{__('Отправить')}}</span>
+                    <div class="loader" v-else />
+                </button>
             </form>
             
         </div>
@@ -61,19 +64,19 @@
 </template>
 
 <script setup lang="ts">
+import { notify } from "@kyvg/vue3-notification";
 import useVuelidate from "@vuelidate/core";
-import { required, sameAs } from "@vuelidate/validators";
-import { computed, onMounted, reactive } from "vue";
+import { required, sameAs, email } from "@vuelidate/validators";
+import { computed, onMounted, onUpdated, reactive, ref } from "vue";
+import { onBeforeRouteUpdate, useRouter } from "vue-router";
 import { DarkSwitcher, Input } from "~/components";
 import { useStore } from "~/store";
 import { ActionTypes } from "~/store/modules/action-types";
 
 const store = useStore()
+const router = useRouter()
 
-onMounted(() => {
-    // alert('validate && main page')
-    // alert('  ')
-})
+
 
 const state = reactive({
     username: '',
@@ -82,20 +85,43 @@ const state = reactive({
     confirmPassword: ''
 })
 
-const rules = computed(() => ({
-    password: sameAs(state.confirmPassword)
-}))
+const isLoaded = ref(true)
 
-const v$ = useVuelidate(rules, state)
+const rules = {
+    email: { email },
+    confirmPassword: { sameAs: sameAs(computed(() => state.password)) }
+}
+const v$ = useVuelidate(rules, state);
+
 
 async function submitHandler() {
-    
-    console.log(v$.value)
-    console.log(await v$.value.$validate(), 'isVALIDs')
-    // debugger
 
-    if(state.username && state.email && state.password){
+    const isValidData = await v$.value.$validate();
+
+    console.log(isValidData, 'ISVALID')
+    console.log(v$.value.email.$invalid)
+
+    if(state.username && state.email && state.password && isValidData){
+        isLoaded.value = false;
         store.dispatch('authReducer/' + ActionTypes.REGISTRATION, state)
+            .then(() => {
+                router.push({
+                    name: 'login'
+                })
+            }).catch((err) => {
+                
+                notify({
+                    group: 'app',
+                    type: 'error',
+                    title: err.response.data.username[0],
+                })
+            })
+            .finally(
+                () => {
+                    isLoaded.value = true;
+                    
+                }
+            )
     }
     
 }
@@ -122,8 +148,9 @@ async function submitHandler() {
         }
 
     }
-
-     
         
-    
+    .error-match {
+        position: unset;
+    }
+
 </style>

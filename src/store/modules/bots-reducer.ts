@@ -9,7 +9,8 @@ export interface SingleBotType {
     token: string;
     description: string;
     owner: number | null;
-    start_message: string | null
+    start_message?: string | null | number;
+    error_message?: string | null | number;
 }
 export interface BotsState {
     bots: Array<SingleBotType>;
@@ -41,8 +42,12 @@ const mutations = {
         state.bots = list
     },
 
-    [MutationTypes.SET_BOT_START_MESSAGE](state, start_message){
-        state.currentBot.start_message = start_message;
+    [MutationTypes.SET_BOT_START_MESSAGE_OR_ERROR](state, statOfMessage){
+        debugger
+        state.currentBot = {
+            ...state.currentBot,
+            ...statOfMessage
+        }
     },
 
     [MutationTypes.APPEND_CREATED_BOT](state, newBotCred) {
@@ -146,15 +151,33 @@ const actions = {
         
     },
 
-    async [ActionTypes.UPDATE_BOT]( { getters, rootState, commit } , setNullNextMessage: boolean) {
-
+    async [ActionTypes.UPDATE_BOT]( { getters, rootState, commit } , config) {
+        let res
         try {
-
-            const res = await botAPI.updateBot( getters['getCurrentBotId'] , {
-                start_message: setNullNextMessage ? null : rootState.messagesReducer.currentMessage.id
+            console.log(rootState.messagesReducer)
+            debugger
+            res = await botAPI.updateBot( getters['getCurrentBotId'] , {
+                start_message: config.start_message ? rootState.messagesReducer.currentMessage.id : null,
+                error_message: config.error_message ? rootState.messagesReducer.currentMessage.id : null
             } );
+            
+            // commit( MutationTypes.SET_BOT_START_MESSAGE_OR_ERROR , {
+            //     start_message: res.data.start_message,
+            //     error_message: res.data.error_message
+            // } );
+                
+            // } else if( config.type === 'error_message' ) {
 
-            commit(MutationTypes.SET_BOT_START_MESSAGE, res.data.start_message);
+            //     res = await botAPI.updateBot( getters['getCurrentBotId'] , {
+            //         error_message: config.resetErrorMessage ? null : rootState.messagesReducer.currentMessage.id
+            //     } );
+    
+            //     commit(MutationTypes.SET_BOT_START_MESSAGE_OR_ERROR, {
+            //         error_message: res.data.error_message
+            //     });
+
+            // }
+
             
             return res
 

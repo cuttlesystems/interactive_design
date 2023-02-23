@@ -61,7 +61,21 @@
 
                 <label class="is__first-message">
 
-                    <input type="checkbox" @change="setAsFirstMessage" :checked="isFirstMesssage" :disabled="!EDIT_CONSTRUCTOR_FORM" />
+                    <input type="checkbox" v-model="startMessage" :disabled="!EDIT_CONSTRUCTOR_FORM" />
+
+                    <SvgIcon nameId="checkmark"></SvgIcon>
+
+                </label>
+
+            </div>
+
+            <div class="first-message">
+
+                <span>{{__('Ошибочное сообщение')}}: </span>
+
+                <label class="is__first-message">
+
+                    <input type="checkbox" v-model="errorMessage" :disabled="!EDIT_CONSTRUCTOR_FORM" />
 
                     <SvgIcon nameId="checkmark"></SvgIcon>
 
@@ -162,9 +176,13 @@ const newMessage = computed(() => store.state.messagesReducer.newMessage)       
 
 const currentMessage = computed(() => store.getters[`messagesReducer/getCurrentMessage`])   // AFTER FETCH
 const isFirstMesssage = computed(() => store.state.botsReducer.currentBot.start_message == currentMessage.value?.id)
+// const isErrorMessage = computed( () => store.state.botsReducer.currentBot.error_message == currentMessage.value?.id)
 
 const notAllowedTypeOptions = ref(true)
 const notEditMessageName = ref(false)
+
+const errorMessage = ref( store.state.botsReducer.currentBot.error_message == currentMessage.value?.id )
+const startMessage = ref( store.state.botsReducer.currentBot.start_message == currentMessage.value?.id )
 
 
 //NODE
@@ -405,7 +423,21 @@ async function completeForm(ev) { // COMPLETE FLOW
 
         // store.commit('messagesReducer/' + MutationTypes.SET_NEW_MESSAGE, newMessageName.value);
         
-        resetAllState()
+        store.dispatch( 'botsReducer/' + ActionTypes.UPDATE_BOT, {
+            
+            start_message: startMessage.value,
+            error_message: errorMessage.value
+
+        }).catch(err => {
+            notify({
+                group: 'app',
+                type: 'error',
+                title: 'Ошибка',
+            })
+        });
+
+        // DO ALL WORK BEFORE 
+        resetAllState();
     }
     
 }
@@ -468,29 +500,37 @@ function deleteLink(option) {
 
 
 // MAKE FIRST MESSAGE
-function setAsFirstMessage(ev) {
+// function setAsFirstMessage(ev) {        // FIX
 
-    if( ev.currentTarget.checked ) {
+//     if( ev.currentTarget.checked ) {
 
-        store.dispatch( 'botsReducer/' + ActionTypes.UPDATE_BOT).catch(err => {
-            notify({
-                group: 'app',
-                type: 'error',
-                title: 'Ошибка',
-            })
-        })
+//         store.dispatch( 'botsReducer/' + ActionTypes.UPDATE_BOT, {
+//             type: 'start_message'
+            
+//         }).catch(err => {
+//             notify({
+//                 group: 'app',
+//                 type: 'error',
+//                 title: 'Ошибка',
+//             })
+//         })
 
-    } else {
-        store.dispatch( 'botsReducer/' + ActionTypes.UPDATE_BOT, true).catch(err => {
-            notify({
-                group: 'app',
-                type: 'error',
-                title: 'Ошибка',
-            })
-        })
-    }
+//     } else {
+//         store.dispatch( 'botsReducer/' + ActionTypes.UPDATE_BOT, {
+//             type: 'start_message',
+//             resetStartMessage: true
+//         }).catch(err => {
+//             notify({
+//                 group: 'app',
+//                 type: 'error',
+//                 title: 'Ошибка',
+//             })
+//         })
+//     }
 
-}
+// }
+
+
 
 //          UPLOAD FILE
 

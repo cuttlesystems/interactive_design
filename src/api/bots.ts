@@ -14,6 +14,7 @@ export const botAPI = {
         return withToken.get(`bots/${botId}/`)
     },
     updateBot(botId, botCred){
+        debugger
         return withToken.patch(`bots/${botId}/`, botCred)
     },
     deteleBot(botId){

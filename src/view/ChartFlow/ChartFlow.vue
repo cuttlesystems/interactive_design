@@ -102,6 +102,7 @@
                 <g 
                     v-for="( option ) of optionListAll"
                     :key="option.id"
+                    
                 >
                     <g v-if="option.next_message">
 
@@ -110,7 +111,7 @@
                             <polygon stroke="none" fill="black" :points="option.computePolygonPosition"></polygon>
                         </mask>
                         <g class="flowchart-link" :data-link_id="option.id" :id="`fc_path_${option.id}_g`" >
-                            <path :id="`fc__path-${option.id}`" stroke-width="3" stroke-dasharray="8" fill="none" :d="option.computePathPosition"
+                            <path @click.capture="onLinkHandler" :id="`fc__path-${option.id}`" stroke-width="3" stroke-dasharray="8" fill="none" :d="option.computePathPosition"
                             stroke="#969696"></path>
                             <rect :x="option?.computeRectPosition?.x" :y="option?.computeRectPosition?.y" width="11" height="2" fill="#969696" stroke="none" :mask="`fc_mask_${option.id}`" />
                         </g>
@@ -471,7 +472,7 @@ onMounted(() => {
 
     // alert ( ' TYPE OF MESSAGES && ERROR MESSAGE && DELETE LINK FEAT && CHECK BOT CREATE PAGE ' )
     // alert( ' UPDATE BOT FEAT && BOT DESCRIPTION -> BOT STRUCTURE ' )
-    // alert ( ' CHECK START BOT ' ) 
+    // alert ( ' CHECK START BOT ' )
 
     sideBarRef.value = document.querySelector('.messenger-flowchart-sidebar');
     
@@ -594,6 +595,10 @@ function resetHandlers () {
     ( controlMap.value as ManageConstructorMap ).reset();
     ( controlConstructor.value as ManageCardConstructor ).reset();
     ( controlLink.value as ManageLinks ).reset();
+}
+
+function onLinkHandler(ev) {
+    debugger
 }
 
 
