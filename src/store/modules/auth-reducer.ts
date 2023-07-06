@@ -2,7 +2,7 @@ import { authAPI } from "api/auth";
 import LocalStorageService from "~/utils/LocalStorageService";
 import { ActionTypes } from "./action-types";
 import { MutationTypes } from "./mutations-types";
-
+    
 /*  Typescript
 *       
     interface Obj<T> { => aslo with Class<Generic>

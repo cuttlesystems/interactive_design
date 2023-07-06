@@ -471,8 +471,9 @@ onMounted(() => {
     // alert ( ' CREATE BOT PAGE && ADD FEAT CHANGE TOKEN BOT' )
 
     // alert ( ' TYPE OF MESSAGES && ERROR MESSAGE && DELETE LINK FEAT && CHECK BOT CREATE PAGE ' )
-    // alert( ' UPDATE BOT FEAT && BOT DESCRIPTION -> BOT STRUCTURE ' )
+    // alert ( ' UPDATE BOT FEAT && BOT DESCRIPTION -> BOT STRUCTURE ' )
     // alert ( ' CHECK START BOT ' )
+    // alert ( ' CHECK VARIANTS DOUBLE DELETE ' )
 
     sideBarRef.value = document.querySelector('.messenger-flowchart-sidebar');
     

@@ -12,9 +12,9 @@ import { devtools } from './devtools'
 import './scss/main.scss'
 
 const app = createApp(App)
-app.mixin(globalSettings)
-app.use(devtools)
-app.use(router)
-app.use(Notifications)
-app.use(store, key )
-app.mount("#app")
+app.mixin( globalSettings )
+app.use( devtools )
+app.use( router )
+app.use( Notifications )
+app.use( store, key )
+app.mount( "#app" )

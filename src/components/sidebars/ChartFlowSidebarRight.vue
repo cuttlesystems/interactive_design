@@ -6,6 +6,7 @@
             <h5 class="sidebar-options-title sidebar-only">
                 {{__('Сообщение')}}
             </h5>
+
             <div class="sidebar-options-title__field">
                 <div>
                     <Input 
@@ -26,6 +27,7 @@
                     {{__('Установить название сообщений')}}
                 </button>
             </div>
+
             <form ref="optionsForm" class="sidebar-form not-allowed">
 
                 <div class="sidebar-form__options">
@@ -54,6 +56,22 @@
                 </div>
 
             </form>
+
+            <div class="sidebar-options-title__field message-type">
+                <div class="message-type" @click="messageTypeToggler = !messageTypeToggler">
+                    <h4 class="message-type__title">
+                        {{ currentTypeMessage.name ? currentTypeMessage.name : __("Выберите тип блока") }}
+                    </h4>
+                    <SvgIcon nameId="arrow-down" />
+                </div>
+                <ul class="message-type__list" v-if="messageTypeToggler">
+                    <li class="message-type__item custom-input__field" v-for="messageType of messageTypeList" :key="messageType.value"
+                        @click="messageTypeHandler( messageType )"
+                    >
+                        {{ messageType.name }}
+                    </li>
+                </ul>
+            </div>
 
             <div class="first-message">
 
@@ -84,17 +102,17 @@
             </div>
 
             <div class="keyboard-type">
-                    <span class="keyboard-type__title">{{__('Тип клавиатуры')}}:</span>
+                <span class="keyboard-type__title">{{__('Тип клавиатуры')}}:</span>
+                
+                <label class="keyboard-type__item"  v-for="keyboard of keyboards" :key="keyboard.id">
+
+                    <span>{{keyboard.name}}</span>
+
+                    <input type="radio" name="keyboard-type__group" :value="keyboard.name" v-model="keyboardComputed" />
+
+                    <SvgIcon nameId="radio-btn"></SvgIcon>
                     
-                    <label class="keyboard-type__item"  v-for="keyboard of keyboards" :key="keyboard.id">
-
-                        <span>{{keyboard.name}}</span>
-
-                        <input type="radio" name="keyboard-type__group" :value="keyboard.name" v-model="keyboardComputed" />
-
-                        <SvgIcon nameId="radio-btn"></SvgIcon>
-                        
-                    </label>
+                </label>
             </div>
 
             <div class="upload-file" ref="uploadContainer">
@@ -183,6 +201,26 @@ const notEditMessageName = ref(false)
 
 const errorMessage = ref( store.state.botsReducer.currentBot.error_message == currentMessage.value?.id )
 const startMessage = ref( store.state.botsReducer.currentBot.start_message == currentMessage.value?.id )
+
+const messageTypeList = ref([
+    {
+        name: 'Варианты',
+        value: 'variants'
+    },
+    {
+        name: 'Для перехода',
+        value: 'goto'
+    },
+    {
+        name: 'Для произвольного ввода',
+        value: 'any_input'
+    },
+])
+const currentTypeMessage = ref({
+    name: '',
+    value: 'initial'
+})
+const messageTypeToggler = ref(false)
 
 
 //NODE
@@ -495,6 +533,13 @@ function deleteLink(option) {
         pathEl.parentElement?.remove();
         fileUpload.value = null
     }
+}
+
+function messageTypeHandler( messageType ) {
+
+    currentTypeMessage.value = messageType;
+    messageTypeToggler.value = false;
+
 }
 
 
@@ -891,6 +936,59 @@ function uploadHandler({ target : { files } }) {
             top: 5px;
         }
 
+    }
+
+    @include b(message-type) {
+        position: relative;
+
+        color: #98999B;
+        background: #F6F6F6;
+        
+        padding: 14px;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 18px;
+
+        @include e(title) {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        @include e(list) {
+            position: absolute;
+            width: 100%;
+            z-index: 52;
+            user-select: none;
+        }
+        
+        @include e(item) {
+
+            padding: 14px;
+            background: #FFFFFF;
+            width: 100%;
+            cursor: pointer;
+
+            &:not(:last-child) {
+                
+                border-bottom: 1px solid #E4E9F2;
+                
+            }
+            
+            
+
+        }
+
+    }
+
+    @include b(icon) {
+        @include e(arrow-down) {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 15px;
+        }
     }
 
 </style>
